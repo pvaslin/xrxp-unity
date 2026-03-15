@@ -1,0 +1,42 @@
+{
+  "name": "com.xrxp.core",
+  "version": "0.1.0",
+  "displayName": "XR Experiments (XRXP)",
+  "description": "A Unity framework for XR experimentation and data recording",
+  "unity": "2021.3",
+  "unityRelease": "20f1",
+  "documentationUrl": "https://espace.science/xrxpdoc/",
+  "changelogUrl": "https://github.com/yourorg/xrxp/blob/main/Packages/com.xrxp.core/CHANGELOG.md",
+  "licensesUrl": "https://github.com/yourorg/xrxp/blob/main/LICENSE",
+  "keywords": [
+    "xr",
+    "experiment",
+    "research",
+    "tracking",
+    "data",
+    "recording",
+    "xrxp"
+  ],
+  "author": {
+    "name": "XRXP Team",
+    "email": "contact@xrxp.io",
+    "url": "https://xrxp.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourorg/xrxp.git"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Setup",
+      "description": "Basic scene setup with XRXP manager",
+      "path": "Samples~/BasicSetup"
+    }
+  ],
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "optionalDependencies": {
+    "com.xrxp.eyetracking": "0.1.0"
+  }
+}

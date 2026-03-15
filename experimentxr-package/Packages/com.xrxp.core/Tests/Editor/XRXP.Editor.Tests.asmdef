@@ -1,0 +1,21 @@
+{
+    "name": "XRXP.Editor.Tests",
+    "rootNamespace": "XRXP.Editor.Tests",
+    "references": [
+        "XRXP.Runtime",
+        "XRXP.Editor",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

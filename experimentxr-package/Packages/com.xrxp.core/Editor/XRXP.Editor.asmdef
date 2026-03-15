@@ -1,0 +1,18 @@
+{
+    "name": "XRXP.Editor",
+    "rootNamespace": "XRXP.Editor",
+    "references": [
+        "XRXP.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
