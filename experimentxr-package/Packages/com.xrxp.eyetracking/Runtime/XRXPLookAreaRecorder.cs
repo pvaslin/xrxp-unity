@@ -6,7 +6,7 @@ using XRXP.Recorder.Models;
 
 namespace XRXP.EyeTracking
 {
-    public class XPXRLookAreaRecorder : MonoBehaviour
+    public class XRXPLookAreaRecorder : MonoBehaviour
     {
         public const string DefaultLayerName = "XRXPArea";
         public bool TracingEnabled = true;

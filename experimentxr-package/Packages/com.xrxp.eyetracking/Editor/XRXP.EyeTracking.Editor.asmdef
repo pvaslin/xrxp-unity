@@ -1,0 +1,19 @@
+{
+    "name": "XRXP.EyeTracking.Editor",
+    "rootNamespace": "XRXP.EyeTracking.Editor",
+    "references": [
+        "XRXP.Runtime",
+        "XRXP.EyeTracking"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,18 @@
+{
+    "name": "com.xrxp.framerate",
+    "displayName": "XRXP FrameRate Analyser",
+    "version": "1.0.0",
+    "unity": "2021.3",
+    "description": "Frame rate monitoring and analysis module for XRXP",
+    "keywords": [
+        "xr",
+        "vr",
+        "frame",
+        "rate",
+        "performance"
+    ],
+    "category": "XR",
+    "dependencies": {
+        "com.xrxp.core": "1.0.0"
+    }
+}

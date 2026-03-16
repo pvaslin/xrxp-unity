@@ -1,0 +1,19 @@
+{
+    "name": "XRXP.SceneController.Editor",
+    "rootNamespace": "XRXP.Modules.SceneController.Editor",
+    "references": [
+        "XRXP.Runtime",
+        "XRXP.SceneController"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

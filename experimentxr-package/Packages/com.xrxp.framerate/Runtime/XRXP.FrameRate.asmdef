@@ -1,0 +1,16 @@
+{
+    "name": "XRXP.FrameRate",
+    "rootNamespace": "XRXP.Modules.FrameRateAnalyser",
+    "references": [
+        "XRXP.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -6,7 +6,7 @@ using XRXP.Recorder.Models;
 
 namespace XRXP.EyeTracking
 {
-    public class XPXREyeRecorder : XRXPObjectTracker
+    public class XRXPEyeRecorder : XRXPObjectTracker
     {
         public LineRenderer lefttmp;
         public LineRenderer righttmp;
