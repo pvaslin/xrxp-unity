@@ -56,8 +56,8 @@ Add the `XRXPObjectTracker` component to any GameObject you want to track:
 1. Select a GameObject in your scene
 2. Add Component → XRXPObjectTracker
 3. Configure:
-   - **Category**: Type of object (e.g., "Hand", "Head", "Prop")
-   - **Object Name**: Display name for tracking
+   - **Category**: Type of object (e.g., "Body")
+   - **Object Name**: Name of object (e.g., "Hand", "Head", "Prop")
    - **Trace Frequency**: How often to record (0 = every frame)
 
 The object's position and rotation will be automatically recorded during sessions.

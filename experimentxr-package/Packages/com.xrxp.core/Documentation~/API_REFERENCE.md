@@ -440,9 +440,9 @@ Automatically tracks GameObject position and rotation.
 | Property | Description |
 |----------|-------------|
 | **Tracing Enabled** | Toggle recording on/off |
-| **Category** | Type of object (e.g., "Body", "Hand", "Prop", "Target") |
-| **Object Name** | Display name for this tracker (defaults to GameObject name) |
-| **Trace Frequency** | Record every N frames (0 = every frame) |
+| **Category** | Type of object (e.g., "Body") |
+| **Object Name** | Name of object (e.g., "Hand", "Head", "Prop") |
+| **Trace Frequency** | How often to record (0 = every frame) |
 
 #### Usage Examples
 
