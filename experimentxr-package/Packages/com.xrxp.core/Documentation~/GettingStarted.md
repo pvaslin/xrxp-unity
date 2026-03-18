@@ -66,4 +66,4 @@ The object's position and rotation will be automatically recorded during session
 
 - Read about [Core Concepts](CoreConcepts.md)
 - Learn about different [Event Types](Tracking.md)
-- Check the [API Reference](API.md)
+ - Check the [API Reference](API_REFERENCE.md)
