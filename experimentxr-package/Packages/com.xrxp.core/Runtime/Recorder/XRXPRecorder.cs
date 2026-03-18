@@ -177,7 +177,7 @@ namespace XRXP.Recorder
         }
 
         /// <summary>
-        /// Indicate to ExperimentXR Trace module to stop the services of transfers after sending all traces remaining
+        /// Indicate to XR Experiments Trace module to stop the services of transfers after sending all traces remaining
         /// </summary>
         public async void EndTracing()
         {
