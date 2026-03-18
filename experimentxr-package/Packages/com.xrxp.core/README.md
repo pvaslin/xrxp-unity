@@ -28,12 +28,24 @@ XR Experiments (XRXP) is a comprehensive framework designed for conducting exper
 1. Clone or download this repository
 2. Copy the `Packages/com.xrxp.core` folder to your project's `Packages` folder
 
-### Optional: Eye Tracking Module
+### Optional Modules
 
-For Oculus eye tracking support, also install:
-```
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking
-```
+Extend XRXP with optional modules:
+
+- **Eye Tracking**: Oculus eye tracking integration
+  ```
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking
+  ```
+
+- **FrameRate Analyser**: Performance monitoring and peak detection
+  ```
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate
+  ```
+
+- **Scene Controller**: WebSocket-based remote scene management
+  ```
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller
+  ```
 
 ## Quick Start
 
