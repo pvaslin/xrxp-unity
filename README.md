@@ -95,17 +95,17 @@ XRXPManager.Recorder.StopSession();
 
 ## Documentation
 
-- [Getting Started Guide](experimentxr-package/Packages/com.xrxp.core/Documentation~/GettingStarted.md)
-- [Core Concepts](experimentxr-package/Packages/com.xrxp.core/Documentation~/CoreConcepts.md)
-- [Modules Overview](experimentxr-package/Packages/com.xrxp.core/Documentation~/Modules.md)
-- [API Reference](experimentxr-package/Packages/com.xrxp.core/Documentation~/API_REFERENCE.md)
+- [Getting Started Guide](xrexperiments-package/Packages/com.xrxp.core/Documentation~/GettingStarted.md)
+- [Core Concepts](xrexperiments-package/Packages/com.xrxp.core/Documentation~/CoreConcepts.md)
+- [Modules Overview](xrexperiments-package/Packages/com.xrxp.core/Documentation~/Modules.md)
+- [API Reference](xrexperiments-package/Packages/com.xrxp.core/Documentation~/API_REFERENCE.md)
 
 ### Module Documentation
 
-- [Eye Tracking](experimentxr-package/Packages/com.xrxp.core/Documentation~/EyeTracking.md)
-- [FrameRate Analyser](experimentxr-package/Packages/com.xrxp.core/Documentation~/FrameRateAnalyser.md)
-- [Scene Controller](experimentxr-package/Packages/com.xrxp.core/Documentation~/SceneController.md)
-- [Creating Custom Modules](experimentxr-package/Packages/com.xrxp.core/Documentation~/ModuleCreationGuide.md)
+- [Eye Tracking](xrexperiments-package/Packages/com.xrxp.core/Documentation~/EyeTracking.md)
+- [FrameRate Analyser](xrexperiments-package/Packages/com.xrxp.core/Documentation~/FrameRateAnalyser.md)
+- [Scene Controller](xrexperiments-package/Packages/com.xrxp.core/Documentation~/SceneController.md)
+- [Creating Custom Modules](xrexperiments-package/Packages/com.xrxp.core/Documentation~/ModuleCreationGuide.md)
 
 ## Project Structure
 
@@ -137,7 +137,7 @@ See [AGENTS.md](AGENTS.md) for:
 /Applications/Unity/Hub/Editor/2021.3.20f1/Unity.app/Contents/MacOS/Unity \
   -runTests -testPlatform EditMode \
   -testResults $(pwd)/test-results.xml \
-  -projectPath $(pwd)/experimentxr-package
+  -projectPath $(pwd)/xrexperiments-package
 ```
 
 ## Contributing
