@@ -31,7 +31,7 @@ namespace XRXP.Editor
                 Undo.RecordObject(target, "Edit XRXPObjectTracker");
                 tracker.TracingEnabled = tracingEnabled;
                 tracker.Category = category;
-                tracker.ObjectName = objectName.Length > 0 ? objectName : tracker.gameObject.name;
+                tracker.ObjectName = !string.IsNullOrEmpty(objectName) ? objectName : tracker.gameObject.name;
                 tracker.TraceFrequency = traceFrequency;
 
                 PrefabUtility.RecordPrefabInstancePropertyModifications(tracker);

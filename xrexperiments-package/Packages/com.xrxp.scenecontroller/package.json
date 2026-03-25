@@ -12,6 +12,11 @@
         "remote"
     ],
     "category": "XR",
+    "author": {
+        "name": "XRXP Team",
+        "email": "contact@xrxp.io",
+        "url": "https://xrxp.io"
+    },
     "dependencies": {
         "com.xrxp.core": "1.0.0"
     }

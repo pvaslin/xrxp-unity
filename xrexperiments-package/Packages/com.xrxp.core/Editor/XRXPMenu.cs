@@ -74,7 +74,7 @@ namespace XRXP.Editor
         [MenuItem("XRXP/About")]
         static void About()
         {
-            Debug.Log("XR Experiments (XRXP) v0.1.0 - XR Experimentation Framework");
+            Debug.Log("XR Experiments (XRXP) v1.0.0 - XR Experimentation Framework");
         }
     }
 }

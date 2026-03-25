@@ -2,17 +2,20 @@
     "name": "XRXP.Tests",
     "rootNamespace": "XRXP.Tests",
     "references": [
-        "XRXP.Runtime",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "XRXP.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
     "versionDefines": [],
-    "noEngineReferences": false
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
 }
