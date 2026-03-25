@@ -13,6 +13,9 @@ namespace XRXP.Modules.SceneController
     /// - Status field "currentScene" (streamed to dashboard)
     /// - Control field "changeScene" (dropdown with all build scenes)
     ///
+    /// Uses [ExchangeControl("changeScene")] attribute for auto-discovery
+    /// by XRXPExchangeManager — visible in the Inspector's attribute handlers section.
+    ///
     /// Requires XRXPExchangeManager on the same or parent GameObject,
     /// or assign one via the ExchangeManager field.
     /// </summary>
@@ -77,9 +80,6 @@ namespace XRXP.Modules.SceneController
             var modality = BuildSceneModality();
             ExchangeManager.Modality = modality;
 
-            // Listen for control commands
-            ExchangeManager.OnControlReceived.AddListener(HandleControlReceived);
-
             // Listen for scene changes to update status
             SceneManager.activeSceneChanged += ChangedActiveScene;
 
@@ -93,7 +93,6 @@ namespace XRXP.Modules.SceneController
 
             if (ExchangeManager != null)
             {
-                ExchangeManager.OnControlReceived.RemoveListener(HandleControlReceived);
                 ExchangeManager.OnConnected.RemoveListener(OnExchangeConnected);
             }
         }
@@ -152,25 +151,28 @@ namespace XRXP.Modules.SceneController
             OnSceneChanged?.Invoke(next.name);
         }
 
-        private void HandleControlReceived(string key, string value)
+        /// <summary>
+        /// Handles the "changeScene" control from the dashboard.
+        /// Auto-discovered by XRXPExchangeManager via [ExchangeControl] attribute.
+        /// </summary>
+        [ExchangeControl("changeScene")]
+        public void HandleChangeScene(string sceneName)
         {
-            if (key != "changeScene") return;
-
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(sceneName))
             {
                 Debug.LogWarning("XRXP.SceneController: Received empty scene name");
                 return;
             }
 
-            if (_sceneNames.Contains(value))
+            if (_sceneNames.Contains(sceneName))
             {
-                Debug.Log($"XRXP.SceneController: Changing scene to {value}");
+                Debug.Log($"XRXP.SceneController: Changing scene to {sceneName}");
                 OnChangeScene?.Invoke();
-                SceneManager.LoadScene(value);
+                SceneManager.LoadScene(sceneName);
             }
             else
             {
-                Debug.LogWarning($"XRXP.SceneController: No scene by this name [{value}]");
+                Debug.LogWarning($"XRXP.SceneController: No scene by this name [{sceneName}]");
             }
         }
     }

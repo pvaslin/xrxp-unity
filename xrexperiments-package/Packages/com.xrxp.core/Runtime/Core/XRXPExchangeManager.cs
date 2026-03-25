@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,8 +11,33 @@ using UnityEngine.Events;
 
 namespace XRXP
 {
+    /// <summary>
+    /// Serialized binding between a control field key and a UnityEvent.
+    /// Auto-synced from the ExchangeModality by the Custom Editor.
+    /// </summary>
     [Serializable]
-    public class ExchangeControlEvent : UnityEvent<string, string> { }
+    public class ExchangeEventBinding
+    {
+        public string Key;
+        public string Label;
+        public UnityEvent<string> OnReceived;
+    }
+
+    /// <summary>
+    /// Tracks a method discovered via [ExchangeControl] attribute at runtime.
+    /// </summary>
+    public class AttributeControlHandler
+    {
+        public string Key;
+        public MonoBehaviour Target;
+        public MethodInfo Method;
+        public string TargetDescription;
+
+        public void Invoke(string value)
+        {
+            Method.Invoke(Target, new object[] { value });
+        }
+    }
 
     public class XRXPExchangeManager : MonoBehaviour
     {
@@ -21,6 +47,10 @@ namespace XRXP
 
         [Tooltip("The XRXP Config to use for connection settings. If null, uses XRXPManager's config.")]
         public XRXPConfig Config;
+
+        [Header("Control Event Bindings")]
+        [Tooltip("Auto-synced from Modality. Wire UnityEvents per control field in the Inspector.")]
+        public List<ExchangeEventBinding> ControlBindings = new List<ExchangeEventBinding>();
 
         [Header("Events")]
         [Tooltip("Fired when any control value is received from the dashboard. Args: (key, value)")]
@@ -37,9 +67,24 @@ namespace XRXP
         private bool _running;
         private string _deviceId;
         private Dictionary<string, string> _statusValues = new Dictionary<string, string>();
-        private Dictionary<string, ExchangeControlEvent> _controlEvents = new Dictionary<string, ExchangeControlEvent>();
+
+        // Attribute-discovered handlers (populated at startup)
+        private List<AttributeControlHandler> _attributeHandlers = new List<AttributeControlHandler>();
+
+        // Fast lookup for serialized bindings by key
+        private Dictionary<string, ExchangeEventBinding> _bindingLookup = new Dictionary<string, ExchangeEventBinding>();
 
         public bool IsConnected => _websocket != null && _websocket.State == WebSocketState.Open;
+
+        /// <summary>
+        /// Read-only access to discovered attribute handlers (used by Custom Editor).
+        /// </summary>
+        public IReadOnlyList<AttributeControlHandler> AttributeHandlers => _attributeHandlers;
+
+        /// <summary>
+        /// Read-only access to current status values (used by Custom Editor for live preview).
+        /// </summary>
+        public IReadOnlyDictionary<string, string> StatusValues => _statusValues;
 
         private void Awake()
         {
@@ -58,6 +103,18 @@ namespace XRXP
             {
                 _statusValues[field.Key] = field.DefaultValue ?? "";
             }
+
+            // Build binding lookup
+            foreach (var binding in ControlBindings)
+            {
+                if (!string.IsNullOrEmpty(binding.Key))
+                {
+                    _bindingLookup[binding.Key] = binding;
+                }
+            }
+
+            // Discover [ExchangeControl] attribute handlers
+            DiscoverAttributeHandlers();
         }
 
         private async void Start()
@@ -79,10 +136,7 @@ namespace XRXP
             DisposeWebSocket();
         }
 
-        public void RegisterControlEvent(string key, ExchangeControlEvent controlEvent)
-        {
-            _controlEvents[key] = controlEvent;
-        }
+        // ── Status API ──────────────────────────────────────────────────
 
         public void SetStatus(string key, string value)
         {
@@ -113,6 +167,52 @@ namespace XRXP
             return _statusValues.TryGetValue(key, out string val) ? val : null;
         }
 
+        // ── Attribute Discovery ─────────────────────────────────────────
+
+        private void DiscoverAttributeHandlers()
+        {
+            _attributeHandlers.Clear();
+
+            // Scan all MonoBehaviours on this GameObject and children
+            var components = GetComponentsInChildren<MonoBehaviour>(true);
+            foreach (var component in components)
+            {
+                if (component == null || component == this) continue;
+
+                var type = component.GetType();
+                var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                foreach (var method in methods)
+                {
+                    var attributes = method.GetCustomAttributes(typeof(ExchangeControlAttribute), true);
+                    foreach (ExchangeControlAttribute attr in attributes)
+                    {
+                        // Validate method signature: must accept a single string parameter
+                        var parameters = method.GetParameters();
+                        if (parameters.Length != 1 || parameters[0].ParameterType != typeof(string))
+                        {
+                            Debug.LogWarning(
+                                $"XRXP.Exchange: Method {type.Name}.{method.Name} has [ExchangeControl(\"{attr.Key}\")] " +
+                                $"but wrong signature. Expected (string). Skipping.");
+                            continue;
+                        }
+
+                        _attributeHandlers.Add(new AttributeControlHandler
+                        {
+                            Key = attr.Key,
+                            Target = component,
+                            Method = method,
+                            TargetDescription = $"{type.Name}.{method.Name}"
+                        });
+
+                        Debug.Log($"XRXP.Exchange: Discovered [{attr.Key}] -> {type.Name}.{method.Name}()");
+                    }
+                }
+            }
+        }
+
+        // ── Connection ──────────────────────────────────────────────────
+
         private async Task Connect()
         {
             var config = Config;
@@ -134,7 +234,6 @@ namespace XRXP
                 return;
             }
 
-            // Build connection URL with token
             string connectUrl = wsUrl;
             if (!string.IsNullOrEmpty(config.AuthorizationToken))
             {
@@ -169,16 +268,10 @@ namespace XRXP
             Debug.Log("XRXP.Exchange: Connected to WebSocket server.");
             OnConnected?.Invoke();
 
-            // Send DeviceConnect first
             await SendMessage(BuildDeviceConnectMessage());
-
-            // Register the modality schema
             await SendMessage(BuildModalityMessage());
-
-            // Send initial status values
             await SendMessage(BuildFullStatusMessage());
 
-            // Start listening for incoming messages
             _running = true;
             _ = ListenLoop();
         }
@@ -230,25 +323,47 @@ namespace XRXP
             }
         }
 
+        // ── Message Processing ──────────────────────────────────────────
+
         private void ProcessIncomingMessage(string json)
         {
-            // Simple JSON parsing for exchange control messages
             if (!json.Contains("ExchangeControl")) return;
 
-            // Extract Values object from the message
             var values = ExtractValues(json);
             if (values == null) return;
 
             foreach (var kvp in values)
             {
-                // Fire specific control event if registered
-                if (_controlEvents.TryGetValue(kvp.Key, out var specificEvent))
-                {
-                    UnityMainThreadDispatcher.Enqueue(() => specificEvent?.Invoke(kvp.Key, kvp.Value));
-                }
+                string key = kvp.Key;
+                string value = kvp.Value;
 
-                // Fire generic control event
-                UnityMainThreadDispatcher.Enqueue(() => OnControlReceived?.Invoke(kvp.Key, kvp.Value));
+                UnityMainThreadDispatcher.Enqueue(() =>
+                {
+                    // 1) Fire serialized Inspector binding
+                    if (_bindingLookup.TryGetValue(key, out var binding))
+                    {
+                        binding.OnReceived?.Invoke(value);
+                    }
+
+                    // 2) Fire attribute-discovered handlers
+                    foreach (var handler in _attributeHandlers)
+                    {
+                        if (handler.Key == key && handler.Target != null)
+                        {
+                            try
+                            {
+                                handler.Invoke(value);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.LogError($"XRXP.Exchange: Error in [{key}] -> {handler.TargetDescription}: {ex.Message}");
+                            }
+                        }
+                    }
+
+                    // 3) Fire generic event
+                    OnControlReceived?.Invoke(key, value);
+                });
             }
         }
 
@@ -256,7 +371,6 @@ namespace XRXP
         {
             var result = new Dictionary<string, string>();
 
-            // Find "Values":{...} in the JSON
             int valuesIdx = json.IndexOf("\"Values\"");
             if (valuesIdx < 0) valuesIdx = json.IndexOf("\"values\"");
             if (valuesIdx < 0) return null;
@@ -284,6 +398,8 @@ namespace XRXP
 
             return result.Count > 0 ? result : null;
         }
+
+        // ── Message Building ────────────────────────────────────────────
 
         private void SendStatusUpdate(string key, string value)
         {
@@ -358,9 +474,12 @@ namespace XRXP
         }
     }
 
+    [Serializable]
+    public class ExchangeControlEvent : UnityEvent<string, string> { }
+
     /// <summary>
-    /// Helper to dispatch actions back to the Unity main thread from async callbacks.
-    /// Attach this component to the same GameObject as XRXPExchangeManager.
+    /// Dispatches actions back to the Unity main thread from async callbacks.
+    /// Auto-created at runtime.
     /// </summary>
     public class UnityMainThreadDispatcher : MonoBehaviour
     {
