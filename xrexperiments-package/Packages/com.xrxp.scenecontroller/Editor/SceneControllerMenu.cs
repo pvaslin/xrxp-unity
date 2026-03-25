@@ -16,13 +16,12 @@ namespace XRXP.Modules.SceneController.Editor
                 Debug.LogError("XRXPManager not found in scene. Please run 'XRXP/Setup the scene' first.");
                 return;
             }
-            
+
             if (gm.GetComponent<XRXPSceneController>() == null)
             {
-                XRXPSceneController controller = gm.AddComponent<XRXPSceneController>();
-                controller.ServiceURL = "ws://localhost:8080"; // Default URL
+                gm.AddComponent<XRXPSceneController>();
             }
-            
+
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
         }
     }

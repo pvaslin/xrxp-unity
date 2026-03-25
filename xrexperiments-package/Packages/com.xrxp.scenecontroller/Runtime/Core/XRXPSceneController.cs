@@ -1,9 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -11,34 +6,44 @@ using UnityEngine.SceneManagement;
 namespace XRXP.Modules.SceneController
 {
     /// <summary>
-    /// WebSocket-based scene controller for remote experiment management.
-    /// Allows remote control of scene changes via WebSocket connection.
+    /// Scene controller that uses the Exchange system for bidirectional
+    /// real-time scene management between the dashboard and Unity.
+    ///
+    /// Automatically registers a modality with:
+    /// - Status field "currentScene" (streamed to dashboard)
+    /// - Control field "changeScene" (dropdown with all build scenes)
+    ///
+    /// Requires XRXPExchangeManager on the same or parent GameObject,
+    /// or assign one via the ExchangeManager field.
     /// </summary>
     public class XRXPSceneController : MonoBehaviour
     {
-        private static XRXPSceneController _singleton = null;
-        private const int MaxAttempt = 3;
-        private ClientWebSocket _websocket;
-        private CancellationTokenSource _cancellationTokenSource;
-        
-        [Header("WebSocket Service URL")]
-        [Tooltip("URL of the XRXP scene controller service")]
-        public string ServiceURL;
-        
+        private static XRXPSceneController _singleton;
+
+        [Header("Exchange")]
+        [Tooltip("Reference to the XRXPExchangeManager. If null, will search on this GameObject and parents.")]
+        public XRXPExchangeManager ExchangeManager;
+
+        [Tooltip("Additional ExchangeModality to merge with the auto-generated scene modality. " +
+                 "Use this to add custom status/control fields alongside scene management.")]
+        public ExchangeModality AdditionalModality;
+
         [Header("Events")]
         public UnityEvent OnChangeScene;
-        
+
+        [Tooltip("Fired after a scene change with the new scene name")]
+        public UnityEvent<string> OnSceneChanged;
+
         private List<string> _sceneNames;
 
         private void Awake()
         {
-            // Verify if the Experiment component is not already started
             if (_singleton == null)
             {
                 _singleton = this;
                 DontDestroyOnLoad(this.gameObject);
             }
-            else if (!XRXPManager.IsReady)
+            else
             {
                 Debug.LogWarning("XRXP: Scene Controller is already set in the scene");
                 Destroy(this.gameObject);
@@ -46,185 +51,126 @@ namespace XRXP.Modules.SceneController
             }
         }
 
-        async void Start()
+        private void Start()
         {
-            this._sceneNames = new List<string>();
+            // Collect all scene names from build settings
+            _sceneNames = new List<string>();
             for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
             {
                 string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
                 int lastSlash = scenePath.LastIndexOf("/");
-                this._sceneNames.Add(scenePath.Substring(lastSlash + 1, scenePath.LastIndexOf(".") - lastSlash - 1));
+                _sceneNames.Add(scenePath.Substring(lastSlash + 1, scenePath.LastIndexOf(".") - lastSlash - 1));
             }
 
-            // Setup scene changes
-            SceneManager.activeSceneChanged += this.ChangedActiveScene;
-
-            // Open websocket
-            this._cancellationTokenSource = new CancellationTokenSource();
-            if (!await this.OpenWebsocket(new Uri($"{this.ServiceURL}/link/{SystemInfo.deviceUniqueIdentifier}")))
+            // Find or create the exchange manager
+            if (ExchangeManager == null)
             {
-                throw new XRXPException("The XRXP server is not reachable, please check if the URL is correct.");
+                ExchangeManager = GetComponentInParent<XRXPExchangeManager>();
             }
-            
-            Message message = new Message
+
+            if (ExchangeManager == null)
             {
-                Protocol = "changeScene",
-                Properties = new Dictionary<string, string>() { { "scene", SceneManager.GetActiveScene().name } }
-            };
-            
-            await this.SendData(message.ToJson());
-            this.NotificationHandler();
+                ExchangeManager = gameObject.AddComponent<XRXPExchangeManager>();
+            }
+
+            // Build the scene exchange modality
+            var modality = BuildSceneModality();
+            ExchangeManager.Modality = modality;
+
+            // Listen for control commands
+            ExchangeManager.OnControlReceived.AddListener(HandleControlReceived);
+
+            // Listen for scene changes to update status
+            SceneManager.activeSceneChanged += ChangedActiveScene;
+
+            // Set initial scene status once connected
+            ExchangeManager.OnConnected.AddListener(OnExchangeConnected);
         }
 
-        void ChangedActiveScene(Scene current, Scene next)
+        private void OnDestroy()
         {
-            if (this._websocket == null || this._websocket.State != WebSocketState.Open)
+            SceneManager.activeSceneChanged -= ChangedActiveScene;
+
+            if (ExchangeManager != null)
             {
+                ExchangeManager.OnControlReceived.RemoveListener(HandleControlReceived);
+                ExchangeManager.OnConnected.RemoveListener(OnExchangeConnected);
+            }
+        }
+
+        private ExchangeModality BuildSceneModality()
+        {
+            var modality = ScriptableObject.CreateInstance<ExchangeModality>();
+
+            // Status: current scene
+            modality.StatusFields = new List<ExchangeStatusField>
+            {
+                new ExchangeStatusField
+                {
+                    Key = "currentScene",
+                    Label = "Current Scene",
+                    Type = ExchangeFieldType.String,
+                    DefaultValue = SceneManager.GetActiveScene().name
+                }
+            };
+
+            // Control: change scene (dropdown with all build scenes)
+            modality.ControlFields = new List<ExchangeControlField>
+            {
+                new ExchangeControlField
+                {
+                    Key = "changeScene",
+                    Label = "Change Scene",
+                    ControlType = ExchangeControlType.Dropdown,
+                    DropdownOptions = _sceneNames.ToArray(),
+                    DefaultValue = _sceneNames.Count > 0 ? _sceneNames[0] : ""
+                }
+            };
+
+            // Merge additional modality fields if provided
+            if (AdditionalModality != null)
+            {
+                modality.StatusFields.AddRange(AdditionalModality.StatusFields);
+                modality.ControlFields.AddRange(AdditionalModality.ControlFields);
+            }
+
+            return modality;
+        }
+
+        private void OnExchangeConnected()
+        {
+            ExchangeManager.SetStatus("currentScene", SceneManager.GetActiveScene().name);
+        }
+
+        private void ChangedActiveScene(Scene current, Scene next)
+        {
+            if (ExchangeManager != null && ExchangeManager.IsConnected)
+            {
+                ExchangeManager.SetStatus("currentScene", next.name);
+            }
+
+            OnSceneChanged?.Invoke(next.name);
+        }
+
+        private void HandleControlReceived(string key, string value)
+        {
+            if (key != "changeScene") return;
+
+            if (string.IsNullOrEmpty(value))
+            {
+                Debug.LogWarning("XRXP.SceneController: Received empty scene name");
                 return;
             }
-            
-            Message message = new Message
-            {
-                Protocol = "changeScene",
-                Properties = new Dictionary<string, string>() { { "scene", next.name } }
-            };
-            
-            this.SendData(message.ToJson());
-        }
 
-        void OnApplicationQuit()
-        {
-            this.DisposeWebSocket();
-        }
-
-        void OnDestroy()
-        {
-            this.DisposeWebSocket();
-        }
-
-        private async Task<bool> OpenWebsocket(Uri uri, string authToken = null)
-        {
-            this._websocket = new ClientWebSocket();
-            if (authToken != null && authToken.Length > 0)
+            if (_sceneNames.Contains(value))
             {
-                this._websocket.Options.SetRequestHeader("Authorization", "Basic " + authToken);
+                Debug.Log($"XRXP.SceneController: Changing scene to {value}");
+                OnChangeScene?.Invoke();
+                SceneManager.LoadScene(value);
             }
-            this._websocket.Options.KeepAliveInterval = new TimeSpan(0, 0, 5);
-            
-            int attempts = MaxAttempt;
-            while (attempts > 0 && (this._websocket.State != WebSocketState.Open))
+            else
             {
-                try
-                {
-                    await this._websocket.ConnectAsync(uri, CancellationToken.None);
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogError($"XRXP.SceneController: {exception.Message}");
-                    attempts -= 1;
-                    await Task.Delay(100);
-                }
-            }
-            
-            return this._websocket.State == WebSocketState.Open;
-        }
-
-        private bool DisposeWebSocket()
-        {
-            if (this._websocket == null)
-                return true;
-                
-            try
-            {
-                this._websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", this._cancellationTokenSource.Token);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"XRXP.SceneController: {exception.Message}");
-            }
-            
-            return this._websocket.State == WebSocketState.Closed;
-        }
-
-        private async Task<bool> SendData(string data)
-        {
-            if (this._websocket == null)
-            {
-                throw new XRXPException("The websocket is not open, please use OpenWebsocket() before sending data");
-            }
-            
-            if (this._websocket.State == WebSocketState.Open)
-            {
-                ArraySegment<byte> bytesToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(data));
-                try
-                {
-                    await this._websocket.SendAsync(bytesToSend, WebSocketMessageType.Text, true, CancellationToken.None);
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogError($"XRXP.SceneController: {exception.Message}");
-                }
-            }
-            
-            return false;
-        }
-
-        private async Task NotificationHandler()
-        {
-            int maxMessageSize = 2048;
-            
-            while (this._websocket != null && this._websocket.State == WebSocketState.Open)
-            {
-                try
-                {
-                    ArraySegment<byte> bytesBuffer = new ArraySegment<byte>(new byte[maxMessageSize]);
-                    WebSocketReceiveResult receiveResult = await this._websocket.ReceiveAsync(bytesBuffer, CancellationToken.None);
-                    
-                    if (receiveResult.MessageType == WebSocketMessageType.Close)
-                    {
-                        await this._websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                    }
-                    else if (receiveResult.MessageType == WebSocketMessageType.Binary)
-                    {
-                        await this._websocket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Cannot accept binary frame", CancellationToken.None);
-                    }
-                    else
-                    {
-                        ArraySegment<byte> buffer = bytesBuffer.Slice(0, receiveResult.Count);
-                        string rawMessage = Encoding.UTF8.GetString(buffer);
-                        Debug.Log(rawMessage);
-                        
-                        try
-                        {
-                            Message message = Message.ConvertJsonToMessage(rawMessage);
-                            if (message.Protocol == "changeScene")
-                            {
-                                if (message.Properties.ContainsKey("scene") && this._sceneNames.Contains(message.Properties["scene"]))
-                                {
-                                    Debug.Log($"Changing scene to {message.Properties["scene"]}");
-                                    this.OnChangeScene?.Invoke();
-                                    SceneManager.LoadScene(message.Properties["scene"]);
-                                }
-                                else if (message.Properties.ContainsKey("scene"))
-                                {
-                                    Debug.Log($"No scene by this name [{message.Properties["scene"]}]");
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.LogError($"XRXP.SceneController: Error processing message - {ex.Message}");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"XRXP.SceneController: WebSocket error - {ex.Message}");
-                    break;
-                }
-                
-                await Task.Delay(10);
+                Debug.LogWarning($"XRXP.SceneController: No scene by this name [{value}]");
             }
         }
     }
