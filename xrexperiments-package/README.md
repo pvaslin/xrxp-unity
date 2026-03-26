@@ -16,7 +16,7 @@ This repository contains the XR Experiments (XRXP) Unity packages following Unit
 │   │   ├── package.json                  # Package manifest
 │   │   ├── CHANGELOG.md
 │   │   └── README.md
-│   └── com.xrxp.eyetracking/             # Optional eye tracking module
+│   └── com.xrxp.module.eyetracking/             # Optional eye tracking module
 │       ├── Runtime/
 │       ├── Editor/
 │       ├── Tests/
@@ -38,7 +38,7 @@ Core XR Experiments (XRXP) framework for XR experimentation and data recording.
 - Object position/rotation tracking
 - XR Integration Toolkit compatible
 
-### com.xrxp.eyetracking
+### com.xrxp.module.eyetracking
 
 Optional eye tracking module using Oculus Integration.
 
@@ -57,7 +57,7 @@ Add to your `Packages/manifest.json`:
 {
   "dependencies": {
     "com.xrxp.core": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core",
-    "com.xrxp.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking"
+    "com.xrxp.module.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking"
   }
 }
 ```

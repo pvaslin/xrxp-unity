@@ -20,14 +20,14 @@ This module provides:
 
 ```
 Add package from git URL:
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate
+https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.framerate": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate"
+    "com.xrxp.module.framerate": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate"
   }
 }
 ```

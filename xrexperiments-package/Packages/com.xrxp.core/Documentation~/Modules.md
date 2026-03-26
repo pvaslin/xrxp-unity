@@ -5,7 +5,7 @@ XRXP Modules are optional extensions that add specific functionality to the core
 ## Available Modules
 
 ### [Eye Tracking](./EyeTracking.md)
-**Package**: `com.xrxp.eyetracking`
+**Package**: `com.xrxp.module.eyetracking`
 
 Integrates Oculus eye tracking to record:
 - Left and right eye positions and rotations
@@ -19,7 +19,7 @@ Integrates Oculus eye tracking to record:
 ---
 
 ### [FrameRate Analyser](./FrameRateAnalyser.md)
-**Package**: `com.xrxp.framerate`
+**Package**: `com.xrxp.module.framerate`
 
 Monitors application performance with:
 - Real-time FPS monitoring
@@ -34,7 +34,7 @@ Monitors application performance with:
 ---
 
 ### [Scene Controller](./SceneController.md)
-**Package**: `com.xrxp.scenecontroller`
+**Package**: `com.xrxp.module.scenecontroller`
 
 Enables remote experiment management via WebSocket:
 - Remote scene switching from a control server
@@ -79,9 +79,9 @@ Module Package/
 1. Open Unity Package Manager (Window > Package Manager)
 2. Click `+` → "Add package from git URL"
 3. Enter the module URL:
-   - Eye Tracking: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking`
-   - FrameRate: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate`
-   - Scene Controller: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller`
+   - Eye Tracking: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking`
+   - FrameRate: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate`
+   - Scene Controller: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller`
 
 ### Dependencies
 

@@ -1,5 +1,5 @@
 {
-  "name": "com.xrxp.eyetracking",
+  "name": "com.xrxp.module.eyetracking",
   "version": "0.1.0",
   "displayName": "XR Experiments Eye Tracking",
   "description": "Eye tracking module for XR Experiments (XRXP) using Oculus integration",

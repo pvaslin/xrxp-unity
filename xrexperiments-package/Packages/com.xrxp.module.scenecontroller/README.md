@@ -21,14 +21,14 @@ WebSocket-based remote scene management module for XRXP Unity framework.
 
 Add via git URL:
 ```
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller
+https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.scenecontroller": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller"
+    "com.xrxp.module.scenecontroller": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller"
   }
 }
 ```

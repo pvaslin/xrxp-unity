@@ -1,15 +1,15 @@
 {
-    "name": "com.xrxp.scenecontroller",
-    "displayName": "XRXP Scene Controller",
+    "name": "com.xrxp.module.framerate",
+    "displayName": "XRXP FrameRate Analyser",
     "version": "1.0.0",
     "unity": "2021.3",
-    "description": "WebSocket-based scene controller module for XRXP experiments",
+    "description": "Frame rate monitoring and analysis module for XRXP",
     "keywords": [
         "xr",
         "vr",
-        "scene",
-        "websocket",
-        "remote"
+        "frame",
+        "rate",
+        "performance"
     ],
     "category": "XR",
     "author": {

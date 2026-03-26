@@ -16,9 +16,9 @@ XRXP (XR Experiments) provides a modular framework for conducting XR research ex
 
 ### Available Modules
 
-- **Eye Tracking** (`com.xrxp.eyetracking`): Oculus eye tracking integration for gaze analysis
-- **FrameRate Analyser** (`com.xrxp.framerate`): Real-time performance monitoring with Z-score peak detection
-- **Scene Controller** (`com.xrxp.scenecontroller`): WebSocket-based remote scene management
+- **Eye Tracking** (`com.xrxp.module.eyetracking`): Oculus eye tracking integration for gaze analysis
+- **FrameRate Analyser** (`com.xrxp.module.framerate`): Real-time performance monitoring with Z-score peak detection
+- **Scene Controller** (`com.xrxp.module.scenecontroller`): WebSocket-based remote scene management
 
 ## Installation
 
@@ -48,9 +48,9 @@ Or add to `Packages/manifest.json`:
 {
   "dependencies": {
     "com.xrxp.core": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core",
-    "com.xrxp.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking",
-    "com.xrxp.framerate": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate",
-    "com.xrxp.scenecontroller": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller"
+    "com.xrxp.module.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking",
+    "com.xrxp.module.framerate": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate",
+    "com.xrxp.module.scenecontroller": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller"
   }
 }
 ```
@@ -113,9 +113,9 @@ XRXPManager.Recorder.StopSession();
 xrxp-unity/
 ├── Packages/
 │   ├── com.xrxp.core/           # Core framework
-│   ├── com.xrxp.eyetracking/    # Eye tracking module
-│   ├── com.xrxp.framerate/      # Performance monitoring
-│   └── com.xrxp.scenecontroller/# Remote scene control
+│   ├── com.xrxp.module.eyetracking/    # Eye tracking module
+│   ├── com.xrxp.module.framerate/      # Performance monitoring
+│   └── com.xrxp.module.scenecontroller/# Remote scene control
 ├── AGENTS.md                     # AI agent guidelines
 └── README.md                     # This file
 ```

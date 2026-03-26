@@ -24,7 +24,7 @@ Add to your Unity project's `Packages/manifest.json`:
 {
   "dependencies": {
     "com.xrxp.core": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core",
-    "com.xrxp.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking"
+    "com.xrxp.module.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking"
   }
 }
 ```

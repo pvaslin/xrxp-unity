@@ -38,7 +38,7 @@ Create the directory structure:
 
 ```
 Packages/
-└── com.xrxp.modulename/
+└── com.xrxp.module.modulename/
     ├── Runtime/
     │   └── XRXP.ModuleName.asmdef
     ├── Editor/
@@ -56,7 +56,7 @@ Create `package.json`:
 
 ```json
 {
-    "name": "com.xrxp.modulename",
+    "name": "com.xrxp.module.modulename",
     "displayName": "XRXP Module Name",
     "version": "1.0.0",
     "unity": "2021.3",
@@ -75,7 +75,7 @@ Create `package.json`:
 ```
 
 **Naming Convention**:
-- Package name: `com.xrxp.lowercase`
+- Package name: `com.xrxp.module.lowercase`
 - Display name: `XRXP PascalCase`
 
 ### 3. Create Assembly Definitions
@@ -265,7 +265,7 @@ Key features:
 
 ```
 Add package from git URL:
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.modulename
+https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.modulename
 ```
 
 ## Components
@@ -435,7 +435,7 @@ Here's a complete example of a simple tracking module:
 ### File Structure
 
 ```
-com.xrxp.inputtracker/
+com.xrxp.module.inputtracker/
 ├── Runtime/
 │   ├── XRXP.InputTracker.asmdef
 │   └── XRXPInputTracker.cs
@@ -450,7 +450,7 @@ com.xrxp.inputtracker/
 
 ```json
 {
-    "name": "com.xrxp.inputtracker",
+    "name": "com.xrxp.module.inputtracker",
     "displayName": "XRXP Input Tracker",
     "version": "1.0.0",
     "unity": "2021.3",

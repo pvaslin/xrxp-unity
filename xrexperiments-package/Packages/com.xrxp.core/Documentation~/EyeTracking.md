@@ -21,14 +21,14 @@ This module provides:
 
 ```
 Add package from git URL:
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking
+https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking"
+    "com.xrxp.module.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking"
   }
 }
 ```

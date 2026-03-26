@@ -37,6 +37,6 @@
     "com.unity.textmeshpro": "3.0.6"
   },
   "optionalDependencies": {
-    "com.xrxp.eyetracking": "0.1.0"
+    "com.xrxp.module.eyetracking": "0.1.0"
   }
 }

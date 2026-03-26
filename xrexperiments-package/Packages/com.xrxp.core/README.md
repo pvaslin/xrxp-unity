@@ -34,17 +34,17 @@ Extend XRXP with optional modules:
 
 - **Eye Tracking**: Oculus eye tracking integration
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.eyetracking
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking
   ```
 
 - **FrameRate Analyser**: Performance monitoring and peak detection
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.framerate
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate
   ```
 
 - **Scene Controller**: WebSocket-based remote scene management
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.scenecontroller
+  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller
   ```
 
 ## Quick Start

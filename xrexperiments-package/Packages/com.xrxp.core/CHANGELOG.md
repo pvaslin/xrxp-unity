@@ -15,6 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Event types: Session, Environment, User, InternalEvent, LogEvent, MediaEvent, Question, Statistic
 - Editor tools: Scene setup menu, configuration editor
 - Assembly Definition files for proper code organization
-- Optional Eye Tracking module (com.xrxp.eyetracking)
+- Optional Eye Tracking module (com.xrxp.module.eyetracking)
 
 [0.1.0]: https://github.com/yourorg/xrxp/releases/tag/v0.1.0
