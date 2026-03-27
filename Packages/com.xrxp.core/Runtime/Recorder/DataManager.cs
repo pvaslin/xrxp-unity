@@ -17,8 +17,14 @@ namespace XRXP.Recorder
         private Stack<Session> _currentSessions;
         private bool _servicesStarted = false;
         private List<IDataStorage> _storages;
+        private RemoteStorage _remoteStorage;
+        private FileUploadStorage _fileUploadStorage;
+        private BackupResender _backupResender;
         private string _workDirectory;
+        private string _backupDirectory;
         private CancellationToken _cancellationToken;
+
+        public bool IsResending => _backupResender != null && _backupResender.IsRunning;
 
         public DataManager(
             CancellationToken cancellationToken,
@@ -31,6 +37,7 @@ namespace XRXP.Recorder
         {
             this._experimentId = experimentId;
             this._workDirectory = $"{Application.persistentDataPath}/XRXP";
+            this._backupDirectory = $"{this._workDirectory}/backup";
             this._storages = new List<IDataStorage>();
             this._currentSessions = new Stack<Session>();
             this._cancellationToken = cancellationToken;
@@ -40,11 +47,21 @@ namespace XRXP.Recorder
             }
             if (webSocketServer != null)
             {
-                this._storages.Add(new RemoteStorage(webSocketServer, authorizationToken));
+                this._remoteStorage = new RemoteStorage(webSocketServer, authorizationToken);
+                this._storages.Add(this._remoteStorage);
             }
             if (fileServer != null)
             {
-                this._storages.Add(new FileUploadStorage(fileServer, authorizationToken));
+                this._fileUploadStorage = new FileUploadStorage(fileServer, authorizationToken);
+                this._storages.Add(this._fileUploadStorage);
+            }
+            if (this._remoteStorage != null)
+            {
+                this._backupResender = new BackupResender(
+                    this._backupDirectory,
+                    this._remoteStorage,
+                    this._fileUploadStorage,
+                    this._cancellationToken);
             }
             if (localStorageMode)
             {
@@ -273,7 +290,7 @@ namespace XRXP.Recorder
                 Uri file = new Uri(filePath);
                 if (file.IsFile && File.Exists(file.AbsolutePath))
                 {
-                    String mediaDirectory = $"{this._workDirectory}/sessions/{session.Id}/medias";
+                    String mediaDirectory = $"{this._backupDirectory}/sessions/{session.Id}/medias";
                     if (!Directory.Exists(mediaDirectory))
                     {
                         Directory.CreateDirectory(mediaDirectory);
@@ -310,7 +327,7 @@ namespace XRXP.Recorder
             // Save the binary on a background thread, then serialize and send once file path is set
             Task.Run(() =>
             {
-                string mediaDirectory = $"{this._workDirectory}/sessions/{session.Id}/medias";
+                string mediaDirectory = $"{this._backupDirectory}/sessions/{session.Id}/medias";
                 if (!Directory.Exists(mediaDirectory))
                 {
                     Directory.CreateDirectory(mediaDirectory);
@@ -369,6 +386,25 @@ namespace XRXP.Recorder
                 total += storage.RemainingDataCount();
             }
             return total;
+        }
+
+        public int PendingBackupFileCount()
+        {
+            return _backupResender != null ? _backupResender.GetPendingFileCount() : 0;
+        }
+
+        public void ResendBackups()
+        {
+            if (_backupResender == null)
+            {
+                Debug.LogWarning("XRXP.Recorder: Cannot resend backups — no remote storage configured.");
+                return;
+            }
+            if (!_servicesStarted)
+            {
+                this.LaunchServices();
+            }
+            _backupResender.ResendAll();
         }
 
         public void Dispose()

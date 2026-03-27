@@ -169,12 +169,46 @@ namespace XRXP.Recorder
         }
 
         /// <summary>
-        /// Indicate the number of remaining traces to send/store
+        /// Returns the total number of records and files still waiting to be sent or stored.
+        /// This includes both the live queue (current session) and unsent backup files from previous sessions.
+        /// Use this to check if it is safe to quit the application.
+        /// </summary>
+        public int RemainingCount => this._dataManager.RemainingTraceCount() + this._dataManager.PendingBackupFileCount();
+
+        /// <summary>
+        /// Returns true if all data has been sent (live queue empty and no pending backups).
+        /// </summary>
+        public bool IsAllSent => RemainingCount == 0 && !IsResending;
+
+        /// <summary>
+        /// Indicate the number of remaining traces to send/store in the live queue.
         /// </summary>
         public int TransfersState()
         {
             return this._dataManager.RemainingTraceCount();
         }
+
+        /// <summary>
+        /// Returns the number of unsent backup files (.backup.gz) from previous sessions.
+        /// </summary>
+        public int PendingBackupFileCount()
+        {
+            return this._dataManager.PendingBackupFileCount();
+        }
+
+        /// <summary>
+        /// Resend all backup data (records and media files) to the remote server.
+        /// Runs on a background thread. Check IsResending for progress.
+        /// </summary>
+        public void ResendBackups()
+        {
+            this._dataManager.ResendBackups();
+        }
+
+        /// <summary>
+        /// Indicates if a backup resend operation is currently in progress.
+        /// </summary>
+        public bool IsResending => this._dataManager.IsResending;
 
         /// <summary>
         /// Stop the recording services. Drains all remaining records before closing connections.
