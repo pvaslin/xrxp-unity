@@ -6,7 +6,7 @@ namespace XRXP.Recorder.Models
     class RecordException : Exception
     {
         public RecordException() { }
-        public RecordException(string message) : base(String.Format("XRXP.Trace : {0}")) { }
-        public RecordException(string message, Exception innerException) : base(String.Format("XRXP.Trace : {0}"), innerException) { }        
+        public RecordException(string message) : base(String.Format("XRXP.Trace : {0}", message)) { }
+        public RecordException(string message, Exception innerException) : base(String.Format("XRXP.Trace : {0}", message), innerException) { }
     }
 }

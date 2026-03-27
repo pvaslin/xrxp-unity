@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using UnityEditor;
-
 namespace XRXP.Recorder.Models
 {
     public class LogEvent : RecordWithProperties

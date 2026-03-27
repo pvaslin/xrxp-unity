@@ -146,7 +146,7 @@ namespace XRXP.Recorder
             }
         }
         
-        public string GetEnvironnementId()
+        public string GetEnvironmentId()
         {
             Session session;
             if (this._currentSessions.TryPeek(out session))
@@ -155,7 +155,7 @@ namespace XRXP.Recorder
             }
             else
             {
-                throw new XRXPException("Cannot get the Environnement Id, there is no started Session.");
+                throw new XRXPException("Cannot get the Environment Id, there is no started Session.");
             }
         }
 
@@ -169,8 +169,8 @@ namespace XRXP.Recorder
             }
             else
             {
-                throw new XRXPException("Cannot add Environnement properties, there is no started Session.");
-            } 
+                throw new XRXPException("Cannot add Environment properties, there is no started Session.");
+            }
         }
 
         public string GetSessionId()
@@ -326,7 +326,7 @@ namespace XRXP.Recorder
         public void AddSessionStatistic(string name, string value, string parameters = null)
         {
             Session session;
-            if (this._currentSessions.TryPeek(out session))
+            if (!this._currentSessions.TryPeek(out session))
             {
                 throw new XRXPException("There is no session started. Please add a Session, before adding a Statistic.");
             }
@@ -339,7 +339,7 @@ namespace XRXP.Recorder
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        public bool isRecording()
+        public bool IsRecording()
         {
             return this._currentSessions.Count > 0;
         }

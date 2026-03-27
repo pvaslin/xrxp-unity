@@ -99,7 +99,7 @@ namespace XRXP.Modules.FrameRateAnalyser
         private double CalculateStandardDeviation(List<double> values)
         {
             double ret = 0;
-            if (values.Count > 0)
+            if (values.Count > 1)
             {
                 double avg = values.Average();
                 double sum = values.Sum(d => Math.Pow(d - avg, 2));

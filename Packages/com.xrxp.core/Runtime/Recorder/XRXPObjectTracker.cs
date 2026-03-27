@@ -51,7 +51,6 @@ namespace XRXP.Recorder
 
         void LateUpdate()
         {
-            // CRITICAL Critical space
             if (this.TraceFrequency != 0 && this._recordCountDown != this.TraceFrequency)
             {
                 this._recordCountDown += 1;
@@ -64,7 +63,7 @@ namespace XRXP.Recorder
 
         internal virtual void Record()
         {
-            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.isRecording())
+            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.IsRecording())
             {
                 WorldPosition wp = new WorldPosition(this.transform.position, this.transform.rotation);
                 XRXPManager.Recorder.AddInternalEvent(SystemType.WorldPosition, this.Category, this._objectName, wp);

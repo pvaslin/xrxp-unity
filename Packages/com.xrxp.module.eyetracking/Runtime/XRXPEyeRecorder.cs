@@ -33,14 +33,7 @@ namespace XRXP.EyeTracking
         /// </summary>
         public Transform ReferenceFrame;
 
-        private Quaternion _initialRotationOffset;
-        private Transform _viewTransform;
         private static int _trackingInstanceCount;
-
-        private void Start()
-        {
-            this.PrepareHeadDirection();
-        }
 
         private void OnEnable()
         {
@@ -98,7 +91,7 @@ namespace XRXP.EyeTracking
             OVRPose? leftEyePose = this.GetEyePose(OVRPlugin.Eye.Left);
             OVRPose? rightEyePose = this.GetEyePose(OVRPlugin.Eye.Right);
 
-            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.isRecording() &&
+            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.IsRecording() &&
             leftEyePose.HasValue && rightEyePose.HasValue)
             {
                 DrawRayEye(this.lefttmp, leftEyePose.Value);
@@ -116,25 +109,6 @@ namespace XRXP.EyeTracking
             var lookDirection = pose.orientation * Vector3.forward;
             line.SetPositions(new Vector3[] { pose.position, lookDirection * 100 });
             Debug.DrawRay(pose.position, lookDirection * 100, Color.blue, 1f);
-        }
-
-        private void PrepareHeadDirection()
-        {
-            string transformName = "HeadLookAtDirection";
-
-            this._viewTransform = new GameObject(transformName).transform;
-
-            if (this.ReferenceFrame)
-            {
-                this._viewTransform.SetPositionAndRotation(this.ReferenceFrame.position, this.ReferenceFrame.rotation);
-            }
-            else
-            {
-                this._viewTransform.SetPositionAndRotation(base.transform.position, Quaternion.identity);
-            }
-
-            this._viewTransform.parent = base.transform.parent;
-            this._initialRotationOffset = Quaternion.Inverse(this._viewTransform.rotation) * base.transform.rotation;
         }
 
         public override string GetObjectName()

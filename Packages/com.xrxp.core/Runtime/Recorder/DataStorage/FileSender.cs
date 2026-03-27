@@ -16,6 +16,7 @@ namespace XRXP.Recorder.Storage
 {
     public class FileSender
     {
+        private static readonly HttpClient _httpClient = new HttpClient();
         private ConcurrentQueue<string> _queue;
         private Task _task;
         private bool _running = false;
@@ -59,34 +60,47 @@ namespace XRXP.Recorder.Storage
             Profiler.EndThreadProfiling();
 #endif
         }
-        private async Task<bool> SendFile(string path) // Do not return value but work inside
+        private async Task<bool> SendFile(string path)
         {
-            HttpClient client = new HttpClient();
-            FileStream stream = System.IO.File.OpenRead(path);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this._endpoint);
+            FileStream stream;
+            try
+            {
+                stream = System.IO.File.OpenRead(path);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"XRXP.Trace.FileSender : Cannot open file {path} - {e.Message}");
+                return false;
+            }
 
-            if (this._authToken != null)
+            try
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue(
-                        scheme: "Basic",
-                        parameter: this._authToken
-                );
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this._endpoint);
+                if (this._authToken != null)
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                            scheme: "Basic",
+                            parameter: this._authToken
+                    );
+                }
+                MultipartFormDataContent content = new MultipartFormDataContent();
+                content.Add(new StreamContent(stream), "file", Path.GetFileName(path));
+                request.Content = content;
+                HttpResponseMessage response = await _httpClient.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return true;
+                }
+                else
+                {
+                    Debug.LogError($"XRXP.Trace.FileSender : {response.StatusCode}\n{response}");
+                }
+                return false;
             }
-            MultipartFormDataContent content = new MultipartFormDataContent();
-            content.Add(new StreamContent(stream), "file", Path.GetFileName(path));
-            request.Content = content;
-            HttpResponseMessage response = await client.SendAsync(request);
-            stream.Dispose();
-            client.Dispose();
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            finally
             {
-                return true;
+                stream.Dispose();
             }
-            else
-            {
-                Debug.LogError($"XRXP.Trace.FileSender : {response.StatusCode}\n{response}");
-            }
-            return false;
         }
 
         public void AsyncAdd(string filepath)

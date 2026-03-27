@@ -8,7 +8,6 @@ using System.Text;
 using System.IO;
 using System.Collections.Concurrent;
 using UnityEngine.Profiling;
-using UnityEditor;
 
 namespace XRXP.Recorder.Storage
 {
@@ -39,7 +38,7 @@ namespace XRXP.Recorder.Storage
                 this._websocket.Options.SetRequestHeader("Authorization", "Basic "+ this._authToken);
             }
             this._websocket.Options.KeepAliveInterval = new TimeSpan(0, 0, 1);
-            int attempts = _maxAttempt; // TODO Faire l'algo de reconnexion 
+            int attempts = _maxAttempt;
             while (attempts > 0 && (this._websocket.State != WebSocketState.Open))
             {
                 try
@@ -163,7 +162,10 @@ namespace XRXP.Recorder.Storage
         {
             this._running = false;
             Debug.Log($"XRXP.Recorder: Wait for remote storage to end");
-            this._task.Wait();
+            if (!this._task.Wait(TimeSpan.FromSeconds(5)))
+            {
+                Debug.LogWarning("XRXP.Recorder: Remote storage did not stop within timeout.");
+            }
             this._task.Dispose();
             Debug.Log($"XRXP.Recorder: Remote storage stopped");
         }

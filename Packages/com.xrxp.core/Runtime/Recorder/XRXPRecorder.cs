@@ -29,8 +29,8 @@ namespace XRXP.Recorder
         /// </summary>
         /// <param name="userId">Set manually the user ID. By default the userID is a UUID</param>
         /// <param name="comments">Use to describe the role of the user who joins the multi player session</param>
-        /// <param name="environmentProperties">Properties who describe the environnement specification</param>
-        /// <param name="environmentId">the environnement Id of the environnement who is already set in the database</param>
+        /// <param name="environmentProperties">Properties who describe the environment specification</param>
+        /// <param name="environmentId">the environment Id of the environment who is already set in the database</param>
         /// <returns></returns>
         public string StartSession(string comments = "", string userId = "", Dictionary<string, string> environmentProperties = null, string environmentId = null)
         {
@@ -46,25 +46,25 @@ namespace XRXP.Recorder
         }
 
         /// <summary>
-        /// Join a multi-user exercise in an environnement
+        /// Join a multi-user exercise in an environment
         /// </summary>
         /// <param name="sessionId">The Session Id of the Session you join</param>
         /// <param name="comments">Use to describe the role of the user who joins the multi player session</param>
         /// <param name="userId">Set manually the user ID. By default the userID is a UUID</param>
-        /// <param name="environmentId">the environnement Id of the environnement who is already set up by one the other participant in the exercise</param>
-        /// <param name="environmentProperties">Properties who describe the environnement specification</param>
+        /// <param name="environmentId">the environment Id of the environment who is already set up by one the other participant in the exercise</param>
+        /// <param name="environmentProperties">Properties who describe the environment specification</param>
         public void JoinSession(string sessionId, string comments, string userId = "", Dictionary<string, string> environmentProperties = null, string environmentId = "")
         {
             this._dataManager.StartSession(comments, userId, environmentProperties, environmentId, sessionId);
         }
 
         /// <summary>
-        /// Get the current environnement ID
+        /// Get the current environment ID
         /// </summary>
-        /// <returns>Environnement ID</returns>
-        public string GetEnvironnementId()
+        /// <returns>Environment ID</returns>
+        public string GetEnvironmentId()
         {
-            return this._dataManager.GetEnvironnementId();
+            return this._dataManager.GetEnvironmentId();
         }
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace XRXP.Recorder
         /// Indicate if a Session is started
         /// </summary>
         /// <returns></returns>
-        public bool isRecording()
+        public bool IsRecording()
         {
-            return this._dataManager.isRecording();
+            return this._dataManager.IsRecording();
         }
 
         /// <summary>

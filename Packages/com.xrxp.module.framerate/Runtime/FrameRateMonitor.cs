@@ -21,9 +21,9 @@ namespace XRXP.Modules.FrameRateAnalyser
             this._deltaTime += (Time.deltaTime - this._deltaTime) * 0.1f;
             int? isPeak = this._peakDetection.IsPeak(this._deltaTime);
             FrameRateStats.PeakSignals.Value += (!isPeak.HasValue) ? 0 : isPeak.Value;
-            FrameRateStats.FPSCounter.Value += (this._deltaTime * 1000f);
+            FrameRateStats.FPSCounter.Value = (this._deltaTime > 0f) ? (1.0f / this._deltaTime) : 0f;
             
-            if (!isPeak.HasValue || !XRXPManager.IsReady || !XRXPManager.Recorder.isRecording())
+            if (!isPeak.HasValue || !XRXPManager.IsReady || !XRXPManager.Recorder.IsRecording())
             {
                 return;
             }

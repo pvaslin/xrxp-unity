@@ -273,7 +273,9 @@ namespace XRXP
             await SendMessage(BuildFullStatusMessage());
 
             _running = true;
-            _ = ListenLoop();
+            _ = ListenLoop().ContinueWith(
+                t => Debug.LogError($"XRXP.Exchange: ListenLoop faulted - {t.Exception?.GetBaseException()?.Message}"),
+                System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private async Task ListenLoop()

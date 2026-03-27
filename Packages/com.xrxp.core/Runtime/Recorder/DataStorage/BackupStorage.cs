@@ -135,10 +135,12 @@ namespace XRXP.Recorder.Storage
         {
             this._running = false;
             Debug.Log($"XRXP.Recorder: Wait for backup storage to end");
-            this._task.Wait();
+            if (!this._task.Wait(TimeSpan.FromSeconds(5)))
+            {
+                Debug.LogWarning("XRXP.Recorder: Backup storage did not stop within timeout.");
+            }
             this._task.Dispose();
             Debug.Log($"XRXP.Recorder: Backup storage stopped");
-
         }
 
         public void AsyncAdd(RecordBase trace)

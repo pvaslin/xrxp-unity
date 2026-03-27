@@ -22,16 +22,9 @@ namespace XRXP.EyeTracking
         public float ConfidenceThreshold = 0.5f;
         public LayerMask AreaMask;
         private OVRPlugin.EyeGazesState _currentEyeGazesState;
-        private Quaternion _initialRotationOffset;
-        private Transform _viewTransform;
         private static int _trackingInstanceCount;
         private GameObject LastGMLookedByLeftEye;
         private GameObject LastGMLookedByRightEye;
-
-        private void Start()
-        {
-            this.PrepareHeadDirection();
-        }
 
         private void OnEnable()
         {
@@ -86,7 +79,7 @@ namespace XRXP.EyeTracking
             OVRPose? leftEyePose = this.GetEyePose(OVRPlugin.Eye.Left);
             OVRPose? rightEyePose = this.GetEyePose(OVRPlugin.Eye.Right);
 
-            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.isRecording() &&
+            if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.IsRecording() &&
             leftEyePose.HasValue && rightEyePose.HasValue)
             {
                 GameObject gameObjectLookedLeft = this.GetGOLooked(leftEyePose.Value);
@@ -133,18 +126,6 @@ namespace XRXP.EyeTracking
                 return raycastHit.transform.gameObject;
             }
             return null;
-        }
-
-        private void PrepareHeadDirection()
-        {
-            string transformName = "HeadLookAtDirection";
-
-            this._viewTransform = new GameObject(transformName).transform;
-
-            this._viewTransform.SetPositionAndRotation(base.transform.position, Quaternion.identity);
-
-            this._viewTransform.parent = base.transform.parent;
-            this._initialRotationOffset = Quaternion.Inverse(this._viewTransform.rotation) * base.transform.rotation;
         }
 
         public enum EyeTrackingMode
