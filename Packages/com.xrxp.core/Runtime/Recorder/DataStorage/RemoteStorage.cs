@@ -1,183 +1,142 @@
 using System;
-using System.Threading.Tasks;
 using System.Net.WebSockets;
-using XRXP.Recorder.Models;
-using System.Threading;
-using UnityEngine;
 using System.Text;
-using System.IO;
-using System.Collections.Concurrent;
-using UnityEngine.Profiling;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace XRXP.Recorder.Storage
 {
-    public class RemoteStorage : IDataStorage
+    public class RemoteStorage : StorageBase
     {
-        private ConcurrentQueue<RecordBase> _queue;
-        private Task _task;
-        private bool _running = false;
-        private const int _maxAttempt = 3;
+        private const int MaxConnectAttempts = 3;
+        private const int MaxSendAttempts = 3;
+
         private ClientWebSocket _websocket;
-        private CancellationTokenSource _cancellationTokenSource;
-        private CancellationToken _cancellationToken;
-        private Uri _uri;
-        private string _authToken = null;
+        private readonly Uri _uri;
+        private readonly string _authToken;
 
         public RemoteStorage(Uri uri, string authorizationToken = null)
         {
-            this._uri = uri;
-            this._authToken = authorizationToken;
-            this._cancellationTokenSource = new CancellationTokenSource();
-            this._queue = new ConcurrentQueue<RecordBase>();
+            _uri = uri;
+            _authToken = authorizationToken;
         }
-        private async Task<bool> OpenWebsocket()
+
+        protected override void OnOpen()
         {
-            this._websocket = new ClientWebSocket();
-            if (this._authToken != null)
-            {
-                this._websocket.Options.SetRequestHeader("Authorization", "Basic "+ this._authToken);
-            }
-            this._websocket.Options.KeepAliveInterval = new TimeSpan(0, 0, 1);
-            int attempts = _maxAttempt;
-            while (attempts > 0 && (this._websocket.State != WebSocketState.Open))
+            ConnectWebSocket();
+        }
+
+        protected override void ProcessRecord(SerializedRecord record)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(record.Json);
+            var segment = new ArraySegment<byte>(bytes);
+
+            for (int attempt = 1; attempt <= MaxSendAttempts; attempt++)
             {
                 try
                 {
-                    await this._websocket.ConnectAsync(this._uri, this._cancellationToken);
+                    if (_websocket == null || _websocket.State != WebSocketState.Open)
+                    {
+                        ConnectWebSocket();
+                    }
+                    _websocket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken)
+                        .GetAwaiter().GetResult();
+                    return;
                 }
-                catch (Exception exception)
+                catch (OperationCanceledException)
                 {
-                    Debug.LogError($"XRXP.Recorder: {exception.Message}");
-                    attempts -= 1;
-                    await Task.Delay(100);
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"XRXP.Recorder [RemoteStorage]: Send attempt {attempt}/{MaxSendAttempts} failed: {e.Message}");
+                    if (attempt < MaxSendAttempts)
+                    {
+                        DisposeWebSocket();
+                        Thread.Sleep(1000);
+                    }
                 }
             }
-            return this._websocket.State == WebSocketState.Open;
+
+            Debug.LogError($"XRXP.Recorder [RemoteStorage]: Failed to send record {record.Id} after {MaxSendAttempts} attempts.");
         }
 
-        private async Task<bool> DisposeWebSocket()
+        protected override void OnClose()
         {
-            try
-            {
-                await this._websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", this._cancellationToken);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"XRXP.Recorder: {exception.Message}");
-            }
-            return this._websocket.State == WebSocketState.Closed;
+            CloseWebSocketGracefully();
+            DisposeWebSocket();
         }
 
-        private async Task<bool> SendData(string data, string idData)
+        private void ConnectWebSocket()
         {
-            if (this._websocket == null)
+            DisposeWebSocket();
+
+            _websocket = new ClientWebSocket();
+            if (_authToken != null)
             {
-                throw new Exception("The websocket is not open, please use Open() before sending data");
+                _websocket.Options.SetRequestHeader("Authorization", "Basic " + _authToken);
             }
-            if (this._websocket.State == WebSocketState.Open)
+            _websocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(1);
+
+            for (int attempt = 1; attempt <= MaxConnectAttempts; attempt++)
             {
-                ArraySegment<byte> bytesToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(data));
-                ArraySegment<byte> bytesBuffer = new ArraySegment<byte>(new byte[2048]);
                 try
                 {
-                    await this._websocket.SendAsync(bytesToSend, WebSocketMessageType.Text, true, this._cancellationToken);
-                    // CRITICAL not check if is correctly handle by the server
-                    // await this._websocket.ReceiveAsync(bytesBuffer, this._cancellationTokenSource.Token);
-                    // return Encoding.UTF8.GetString(bytesBuffer).Contains(idData);
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogError($"XRXP.Recorder: {exception.Message}");
-                }
-            }
-            return false;
-        }
-
-        private async Task<bool> SendTrace(RecordBase trace)
-        {
-            bool sent = true;
-            if (!trace.isSent)
-            {
-                sent = await this.SendData(JsonUtility.ToJson(trace), trace.Id);
-            }
-            if (trace is RecordWithProperties)
-            {
-                foreach (var property in ((RecordWithProperties)trace).GetProperties())
-                {
-                    if (!property.isSent)
+                    _websocket.ConnectAsync(_uri, CancellationToken)
+                        .GetAwaiter().GetResult();
+                    if (_websocket.State == WebSocketState.Open)
                     {
-                        sent = sent && await this.SendTrace(property);
+                        return;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"XRXP.Recorder [RemoteStorage]: Connect attempt {attempt}/{MaxConnectAttempts} failed: {e.Message}");
+                    if (attempt < MaxConnectAttempts)
+                    {
+                        Thread.Sleep(1000);
                     }
                 }
             }
-            return sent;
+
+            Debug.LogWarning($"XRXP.Recorder [RemoteStorage]: Could not connect to {_uri}");
         }
 
-        private async Task SendLoop()
+        private void CloseWebSocketGracefully()
         {
-// #if UNITY_EDITOR
-//             Profiler.BeginThreadProfiling("StorageSystem", this.GetType().ToString());
-//             Debug.Log($"Task: Internal Loop of Remote Storage {System.Threading.Thread.CurrentThread.ManagedThreadId}");
-// #endif
-            this._running = true;
-            await this.OpenWebsocket();
-            while (this._running  && ! this._cancellationToken.IsCancellationRequested)
+            if (_websocket != null && _websocket.State == WebSocketState.Open)
             {
-                RecordBase trace;
-                if (this._queue.TryPeek(out trace))
+                try
                 {
-                    if (await this.SendTrace(trace))
+                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
                     {
-                        this._queue.TryDequeue(out trace);
-                    }
-                    else
-                    {
-                        if (!await this.OpenWebsocket())
-                        {
-                            Debug.LogWarning($"Server not accessible : {this._uri.Host}");
-                            await Task.Delay(1000);
-                        }
+                        _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", cts.Token)
+                            .GetAwaiter().GetResult();
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    await Task.Delay(10, this._cancellationToken);
+                    Debug.LogWarning($"XRXP.Recorder [RemoteStorage]: Graceful close failed: {e.Message}");
                 }
             }
-            this._websocket.Dispose();
-// #if UNITY_EDITOR
-//             Profiler.EndThreadProfiling();
-// #endif
         }
 
-        public void Open(CancellationToken cancellationToken)
+        private void DisposeWebSocket()
         {
-            this._cancellationToken = cancellationToken;
-            TaskFactory taskFactory = new TaskFactory(cancellationToken, TaskCreationOptions.LongRunning, TaskContinuationOptions.LongRunning, TaskScheduler.Default);
-            this._task = taskFactory.StartNew(this.SendLoop);
-        }
-
-        public void Dispose()
-        {
-            this._running = false;
-            Debug.Log($"XRXP.Recorder: Wait for remote storage to end");
-            if (!this._task.Wait(TimeSpan.FromSeconds(5)))
+            if (_websocket != null)
             {
-                Debug.LogWarning("XRXP.Recorder: Remote storage did not stop within timeout.");
+                try
+                {
+                    _websocket.Dispose();
+                }
+                catch (Exception) { }
+                _websocket = null;
             }
-            this._task.Dispose();
-            Debug.Log($"XRXP.Recorder: Remote storage stopped");
-        }
-
-        public void AsyncAdd(RecordBase trace)
-        {
-            this._queue.Enqueue(trace);
-        }
-
-        public int RemainingDataCount()
-        {
-            return this._queue.Count;
         }
     }
 }

@@ -177,18 +177,16 @@ namespace XRXP.Recorder
         }
 
         /// <summary>
-        /// Indicate to XR Experiments Trace module to stop the services of transfers after sending all traces remaining
+        /// Stop the recording services. Drains all remaining records before closing connections.
         /// </summary>
-        public async void EndTracing()
+        public void EndTracing()
         {
-            await this._dataManager.SafeDispose();
-            // this._dataManager.Dispose();
+            this._dataManager.Dispose();
         }
 
         public void QuitApplication()
         {
             this._dataManager.Dispose();
         }
-
     }
 }

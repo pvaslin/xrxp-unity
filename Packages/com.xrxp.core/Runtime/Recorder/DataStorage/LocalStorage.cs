@@ -1,19 +1,21 @@
 
 using System.Threading;
-using System.Threading.Tasks;
-using XRXP.Recorder.Models;
 
 namespace XRXP.Recorder.Storage
 {
     public class LocalStorage : IDataStorage
     {
-
-        public LocalStorage(string path, Session session)
+        public LocalStorage(string path)
         {
             throw new System.NotImplementedException();
         }
 
-        public void AsyncAdd(RecordBase trace)
+        public void Add(SerializedRecord record)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void CompleteAdding()
         {
             throw new System.NotImplementedException();
         }

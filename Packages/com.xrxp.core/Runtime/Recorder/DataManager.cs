@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -12,12 +12,11 @@ namespace XRXP.Recorder
 {
     public class DataManager
     {
-        private string _experimentId; // the ID of the experiment
-        private User _user; // the current user
+        private string _experimentId;
+        private User _user;
         private Stack<Session> _currentSessions;
         private bool _servicesStarted = false;
         private List<IDataStorage> _storages;
-        private FileSender _fileSender = null;
         private string _workDirectory;
         private CancellationToken _cancellationToken;
 
@@ -38,7 +37,6 @@ namespace XRXP.Recorder
             if (backUpStorageMode)
             {
                 this._storages.Add(new BackupStorage(this._workDirectory));
-                // this._storages.Add(new BackupStorageSync(this._workDirectory));
             }
             if (webSocketServer != null)
             {
@@ -46,7 +44,7 @@ namespace XRXP.Recorder
             }
             if (fileServer != null)
             {
-                this._fileSender = new FileSender(fileServer, authorizationToken);
+                this._storages.Add(new FileUploadStorage(fileServer, authorizationToken));
             }
             if (localStorageMode)
             {
@@ -66,23 +64,29 @@ namespace XRXP.Recorder
                 Debug.Log("Storage " + storage.GetType().ToString());
                 storage.Open(this._cancellationToken);
             }
-            if (this._fileSender != null)
-            {
-                this._fileSender.Open(this._cancellationToken);
-            }
         }
 
+        /// <summary>
+        /// Serialize a record on the main thread and fan out to all storage backends.
+        /// Handles RecordWithProperties by recursively serializing sub-records.
+        /// </summary>
         private void SendTrace(RecordBase trace)
         {
+            string json = JsonUtility.ToJson(trace);
+            string filePath = (trace is MediaEvent media) ? media.GetFilePath() : null;
+            var serialized = new SerializedRecord(trace.Id, json, filePath);
+
             foreach (IDataStorage storage in this._storages)
             {
-                storage.AsyncAdd(trace);
+                storage.Add(serialized);
             }
 
-            if (this._fileSender != null && trace is MediaEvent)
+            if (trace is RecordWithProperties rwp)
             {
-                MediaEvent media = (trace as MediaEvent);
-                this._fileSender.AsyncAdd(media.GetFilePath());
+                foreach (var property in rwp.GetProperties())
+                {
+                    SendTrace(property);
+                }
             }
         }
 
@@ -145,7 +149,7 @@ namespace XRXP.Recorder
                 throw new XRXPException("Cannot get the User Id, there is no current user, please start a session which create a new user.");
             }
         }
-        
+
         public string GetEnvironmentId()
         {
             Session session;
@@ -196,7 +200,6 @@ namespace XRXP.Recorder
             InternalSystem internalSystem;
             if (!session.TryGetInternalSystem(systemName, out internalSystem))
             {
-                // If the internalSystem doesn't exist create one
                 internalSystem = new InternalSystem(systemName, systemType, this._user, session);
                 this.SendTrace(internalSystem);
                 session.AddInternalSystem(internalSystem);
@@ -264,7 +267,7 @@ namespace XRXP.Recorder
             }
             MediaEvent media = new MediaEvent(this.GetTime(), mimeType, name, this._user, session, duration);
 
-            // Copy the file to the XRXP directory. This action use a Task to unload the MainThread
+            // Copy the file on a background thread, then serialize and send on completion
             Task.Run(() =>
             {
                 Uri file = new Uri(filePath);
@@ -279,7 +282,14 @@ namespace XRXP.Recorder
                     File.Copy(file.AbsolutePath, cpFilePath);
 
                     media.SetFilePath(cpFilePath);
-                    this.SendTrace(media);
+                    // Serialize here — JsonUtility.ToJson is safe from background threads in Unity 2020+
+                    // but the record is fully constructed at this point
+                    string json = JsonUtility.ToJson(media);
+                    var serialized = new SerializedRecord(media.Id, json, cpFilePath);
+                    foreach (IDataStorage storage in this._storages)
+                    {
+                        storage.Add(serialized);
+                    }
                 }
                 else
                 {
@@ -296,9 +306,8 @@ namespace XRXP.Recorder
                 throw new XRXPException("Cannot add an MediaEvent, there is no started session.");
             }
             MediaEvent media = new MediaEvent(this.GetTime(), mimeType, name, this._user, session, duration);
-            this.SendTrace(media);
 
-            // Save the binary to the XRXP directory. This action use a Task to unload the MainThread
+            // Save the binary on a background thread, then serialize and send once file path is set
             Task.Run(() =>
             {
                 string mediaDirectory = $"{this._workDirectory}/sessions/{session.Id}/medias";
@@ -306,20 +315,24 @@ namespace XRXP.Recorder
                 {
                     Directory.CreateDirectory(mediaDirectory);
                 }
-                string filePath = $"{mediaDirectory}/{media.Id}{MimeTypeMap.GetExtension(mimeType)}";
+                string savedFilePath = $"{mediaDirectory}/{media.Id}{MimeTypeMap.GetExtension(mimeType)}";
                 try
                 {
-                    FileStream fs = File.Create(filePath);
+                    FileStream fs = File.Create(savedFilePath);
                     fs.Write(bytes);
                     fs.Dispose();
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
-
-                    throw new XRXPException($"The file is not accessible ({filePath})");
+                    throw new XRXPException($"The file is not accessible ({savedFilePath})");
                 }
-                media.SetFilePath(filePath);
-                this.SendTrace(media);
+                media.SetFilePath(savedFilePath);
+                string json = JsonUtility.ToJson(media);
+                var serialized = new SerializedRecord(media.Id, json, savedFilePath);
+                foreach (IDataStorage storage in this._storages)
+                {
+                    storage.Add(serialized);
+                }
             }, this._cancellationToken);
         }
 
@@ -353,27 +366,9 @@ namespace XRXP.Recorder
             int total = 0;
             foreach (IDataStorage storage in this._storages)
             {
-                // Debug.Log($"Data to send Remaining for {storage.GetType().ToString()}: {storage.RemainingDataCount()}");
                 total += storage.RemainingDataCount();
             }
-
-            if (this._fileSender != null)
-            {
-                // Debug.Log($"Data to send Remaining for File: {this._fileSender.RemainingFileCount()}");
-                total += this._fileSender.RemainingFileCount();
-            }
             return total;
-        }
-
-        public async Task<bool> SafeDispose()
-        {
-            while (this.RemainingTraceCount() != 0)
-            {
-                // await Task.Yield(); 
-                await Task.Delay(10);
-            }
-            this.Dispose();
-            return true;
         }
 
         public void Dispose()
@@ -386,21 +381,16 @@ namespace XRXP.Recorder
             {
                 Debug.LogError(new XRXPException("A session is running. Please stop the sessions before stopping the XRXP record service."));
             }
+            // Signal all storages to stop accepting, then wait for drain
+            foreach (IDataStorage storage in this._storages)
+            {
+                storage.CompleteAdding();
+            }
             foreach (IDataStorage storage in this._storages)
             {
                 storage.Dispose();
             }
-
-            if (this._fileSender != null)
-            {
-                this._fileSender.Dispose();
-            }
             this._servicesStarted = false;
-        }
-
-        ~DataManager() // Finalizer
-        {
-            this.Dispose();
         }
     }
 }

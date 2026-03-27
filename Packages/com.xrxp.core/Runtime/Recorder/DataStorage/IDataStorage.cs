@@ -1,34 +1,29 @@
+using System;
 using System.Threading;
-using XRXP.Recorder.Models;
 
 namespace XRXP.Recorder.Storage
 {
-    public interface IDataStorage
+    public interface IDataStorage : IDisposable
     {
         /// <summary>
-        /// Prepare the trace to be send (open File, open websocket etc.)
+        /// Start the storage backend (open connections, start consumer thread).
         /// </summary>
-        /// <returns></returns>
-        public void Open(CancellationToken cancellationToken);
+        void Open(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Return the number of data who remain to be store
+        /// Return the number of records remaining to be stored.
         /// </summary>
-        /// <returns></returns>
-        public int RemainingDataCount();
+        int RemainingDataCount();
 
         /// <summary>
-        /// Indicate to dispose the stream open (close file, close websocket etc.)
-        /// If its remain data to store, they will not store and lost
+        /// Signal that no more records will be added. The consumer thread will
+        /// drain remaining records and exit.
         /// </summary>
-        /// <returns></returns>
-        public void Dispose();
+        void CompleteAdding();
 
         /// <summary>
-        /// Add a trace to store
+        /// Enqueue a pre-serialized record for storage.
         /// </summary>
-        /// <param name="trace"></param>
-        public void AsyncAdd(RecordBase trace);      
+        void Add(SerializedRecord record);
     }
-
 }
