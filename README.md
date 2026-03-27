@@ -28,16 +28,17 @@ XRXP (XR Experiments) provides a modular framework for conducting XR research ex
 
 ### Core Package
 
-```bash
-# Via Package Manager (Git URL)
-https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core
+In Unity Package Manager, click `+` > "Add package from git URL" and enter:
+
+```
+https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.core": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core"
+    "com.xrxp.core": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core"
   }
 }
 ```
@@ -47,12 +48,19 @@ Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.core": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core",
-    "com.xrxp.module.eyetracking": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking",
-    "com.xrxp.module.framerate": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate",
-    "com.xrxp.module.scenecontroller": "https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller"
+    "com.xrxp.core": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core",
+    "com.xrxp.module.eyetracking": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.eyetracking",
+    "com.xrxp.module.framerate": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.framerate",
+    "com.xrxp.module.scenecontroller": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.scenecontroller"
   }
 }
+```
+
+### Pin to a Specific Version
+
+Append `#v0.1.0` (or a commit hash) to pin a version:
+```
+https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core#v0.1.0
 ```
 
 ## Quick Start
@@ -93,52 +101,30 @@ XRXPManager.Recorder.AddQuestion("Comfort Level", "High");
 XRXPManager.Recorder.StopSession();
 ```
 
-## Documentation
-
-- [Getting Started Guide](xrexperiments-package/Packages/com.xrxp.core/Documentation~/GettingStarted.md)
-- [Core Concepts](xrexperiments-package/Packages/com.xrxp.core/Documentation~/CoreConcepts.md)
-- [Modules Overview](xrexperiments-package/Packages/com.xrxp.core/Documentation~/Modules.md)
-- [API Reference](xrexperiments-package/Packages/com.xrxp.core/Documentation~/API_REFERENCE.md)
-
-### Module Documentation
-
-- [Eye Tracking](xrexperiments-package/Packages/com.xrxp.core/Documentation~/EyeTracking.md)
-- [FrameRate Analyser](xrexperiments-package/Packages/com.xrxp.core/Documentation~/FrameRateAnalyser.md)
-- [Scene Controller](xrexperiments-package/Packages/com.xrxp.core/Documentation~/SceneController.md)
-- [Creating Custom Modules](xrexperiments-package/Packages/com.xrxp.core/Documentation~/ModuleCreationGuide.md)
-
 ## Project Structure
 
 ```
 xrxp-unity/
 ├── Packages/
-│   ├── com.xrxp.core/           # Core framework
+│   ├── com.xrxp.core/                  # Core framework
 │   ├── com.xrxp.module.eyetracking/    # Eye tracking module
 │   ├── com.xrxp.module.framerate/      # Performance monitoring
 │   └── com.xrxp.module.scenecontroller/# Remote scene control
-├── AGENTS.md                     # AI agent guidelines
-└── README.md                     # This file
+├── AGENTS.md                            # AI agent guidelines
+├── LICENSE
+└── README.md
 ```
+
+## Documentation
+
+- [Core Package README](Packages/com.xrxp.core/README.md)
+- [Full Documentation](https://espace.science/xrxpdoc/)
 
 ## Development
 
 ### Coding Standards
 
-See [AGENTS.md](AGENTS.md) for:
-- Naming conventions
-- Code style guidelines
-- File organization
-- Best practices
-
-### Running Tests
-
-```bash
-# All tests
-/Applications/Unity/Hub/Editor/2021.3.20f1/Unity.app/Contents/MacOS/Unity \
-  -runTests -testPlatform EditMode \
-  -testResults $(pwd)/test-results.xml \
-  -projectPath $(pwd)/xrexperiments-package
-```
+See [AGENTS.md](AGENTS.md) for naming conventions, code style, and best practices.
 
 ## Contributing
 
@@ -148,19 +134,11 @@ See [AGENTS.md](AGENTS.md) for:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Merge Request
 
-Please follow the coding standards in [AGENTS.md](AGENTS.md).
-
 ## License
 
-[Your License Here]
+[MIT License](LICENSE)
 
 ## Support
 
 - Documentation: See `Documentation~` folders in each package
-- Issues: [GitLab Issues](http://gitlab.espace.science/pierre/xrxp-unity/-/issues)
-- Discussions: [GitLab Discussions](http://gitlab.espace.science/pierre/xrxp-unity/-/discussions)
-
-## Acknowledgments
-
-- Original modules from [Freemix Framework](https://gitlab.espace.science/pierre/freemix_framework)
-- Built for XR research and experimentation
+- Issues: [GitLab Issues](https://gitlab.espace.science/pierre/xrxp-unity/-/issues)
