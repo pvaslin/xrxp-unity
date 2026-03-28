@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,23 +6,24 @@ namespace XRXP.Recorder.Models
 {
     public class Question : RecordWithProperties
     {
+        public string QuestionId;
         public string Label;
         public string Answer;
         public string SessionId;
+        public string UserId;
 
         private Session Session;
-
         private List<QuestionProperty> _questionProperties = new List<QuestionProperty>();
 
-
-        public Question(string label, string answer, Session session, string protocol = "")
+        public Question(string questionId, string label, string answer, Session session = null, string userId = "", string protocol = "")
         {
             this.Id = Guid.NewGuid().ToString();
-
-            this.Label = label;
-            this.Answer = answer;
+            this.QuestionId = string.IsNullOrEmpty(questionId) ? this.Id : questionId;
+            this.Label = label ?? "";
+            this.Answer = answer ?? "";
             this.Session = session;
-            this.SessionId = session.Id;
+            this.SessionId = session?.Id ?? "";
+            this.UserId = userId ?? "";
             this.Protocol = protocol.Length > 0 ? protocol : "Question";
         }
 
@@ -32,11 +33,11 @@ namespace XRXP.Recorder.Models
             this._questionProperties.Add(questionProperty);
         }
 
-        public void AddQuestionProperties(Dictionary<string,string> properties)
+        public void AddQuestionProperties(Dictionary<string, string> properties)
         {
-            foreach (KeyValuePair<string,string> item in properties)
+            foreach (KeyValuePair<string, string> item in properties)
             {
-                this.AddQuestionProperty(item.Key,item.Value);
+                this.AddQuestionProperty(item.Key, item.Value);
             }
         }
 
@@ -44,6 +45,7 @@ namespace XRXP.Recorder.Models
         {
             return this._questionProperties;
         }
+
         public override List<RecordBase> GetProperties()
         {
             return new List<RecordBase>(this._questionProperties);

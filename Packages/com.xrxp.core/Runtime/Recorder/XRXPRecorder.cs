@@ -140,7 +140,7 @@ namespace XRXP.Recorder
         }
 
         /// <summary>
-        /// Create a answer to the question
+        /// Create an answer to a question (backwards compatible, generates random questionId)
         /// </summary>
         /// <param name="label">Label of the question</param>
         /// <param name="answer">Answer of the question</param>
@@ -148,6 +148,44 @@ namespace XRXP.Recorder
         public void AddQuestion(string label, string answer, Dictionary<string, string> properties = null)
         {
             this._dataManager.AddQuestion(label, answer, properties);
+        }
+
+        /// <summary>
+        /// Create an answer to a specific question with developer-defined ID for grouping answers across sessions/users
+        /// </summary>
+        /// <param name="questionId">Developer-defined identifier for grouping answers to the same question</param>
+        /// <param name="label">Question text/label</param>
+        /// <param name="answer">Answer text</param>
+        /// <param name="properties">Optional metadata</param>
+        public void AddQuestion(string questionId, string label, string answer, Dictionary<string, string> properties = null)
+        {
+            this._dataManager.AddQuestion(questionId, label, answer, "", null, properties);
+        }
+
+        /// <summary>
+        /// Create an answer with user context
+        /// </summary>
+        /// <param name="questionId">Developer-defined identifier for grouping answers to the same question</param>
+        /// <param name="label">Question text/label</param>
+        /// <param name="answer">Answer text</param>
+        /// <param name="userId">User ID to associate with this answer</param>
+        /// <param name="properties">Optional metadata</param>
+        public void AddQuestion(string questionId, string label, string answer, string userId, Dictionary<string, string> properties = null)
+        {
+            this._dataManager.AddQuestion(questionId, label, answer, userId, null, properties);
+        }
+
+        /// <summary>
+        /// Create a standalone question answer (no session link)
+        /// </summary>
+        /// <param name="questionId">Developer-defined identifier for grouping answers to the same question</param>
+        /// <param name="label">Question text/label</param>
+        /// <param name="answer">Answer text</param>
+        /// <param name="userId">User ID to associate with this answer</param>
+        /// <param name="properties">Optional metadata</param>
+        public void AddStandaloneQuestion(string questionId, string label, string answer, string userId, Dictionary<string, string> properties = null)
+        {
+            this._dataManager.AddStandaloneQuestion(questionId, label, answer, userId, properties);
         }
 
         /// <summary>

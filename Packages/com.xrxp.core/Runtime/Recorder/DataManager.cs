@@ -247,12 +247,32 @@ namespace XRXP.Recorder
 
         public void AddQuestion(string label, string answer, Dictionary<string, string> properties = null)
         {
-            Session session;
-            if (!this._currentSessions.TryPeek(out session))
+            this.AddQuestion(Guid.NewGuid().ToString(), label, answer, "", null, properties);
+        }
+
+        public void AddQuestion(string questionId, string label, string answer, string userId = "", Session session = null, Dictionary<string, string> properties = null)
+        {
+            Session targetSession = session;
+            if (targetSession == null && this._currentSessions.Count > 0)
             {
-                throw new XRXPException("There is no session started. Please add a Session, before adding a Question.");
+                this._currentSessions.TryPeek(out targetSession);
             }
-            Question question = new Question(label, answer, session);
+            string targetUserId = userId;
+            if (string.IsNullOrEmpty(targetUserId) && this._user != null)
+            {
+                targetUserId = this._user.Id;
+            }
+            Question question = new Question(questionId, label, answer, targetSession, targetUserId);
+            if (properties != null)
+            {
+                question.AddQuestionProperties(properties);
+            }
+            this.SendTrace(question);
+        }
+
+        public void AddStandaloneQuestion(string questionId, string label, string answer, string userId, Dictionary<string, string> properties = null)
+        {
+            Question question = new Question(questionId, label, answer, null, userId);
             if (properties != null)
             {
                 question.AddQuestionProperties(properties);
