@@ -24,7 +24,7 @@ namespace XRXP.Recorder.Storage
             }
             _path = $"{_directory}/Trace_{DateTime.Now:yyyy-MM-dd_HH_mm_ss}.backup.gz";
             _stream = new StreamWriter(
-                new GZipStream(File.Create(_path), CompressionLevel.Fastest));
+                new GZipStream(File.Create(_path), System.IO.Compression.CompressionLevel.Fastest));
             _stream.AutoFlush = true;
             Debug.Log($"XRXP.Recorder [BackupStorage]: Writing to {_path}");
         }

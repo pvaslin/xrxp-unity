@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using Unity.Profiling;
 
 namespace XRXP.Modules.FrameRateAnalyser
@@ -22,3 +24,5 @@ namespace XRXP.Modules.FrameRateAnalyser
                 ProfilerCounterOptions.FlushOnEndOfFrame | ProfilerCounterOptions.ResetToZeroOnFlush);
     }
 }
+
+#endif

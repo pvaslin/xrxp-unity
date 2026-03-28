@@ -2,7 +2,8 @@
     "name": "XRXP.FrameRate",
     "rootNamespace": "XRXP.Modules.FrameRateAnalyser",
     "references": [
-        "XRXP.Runtime"
+        "XRXP.Runtime",
+        "Unity.Profiling.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -61,7 +61,7 @@ namespace XRXP.Recorder
             this._recordCountDown = 1;
         }
 
-        internal virtual void Record()
+        protected internal virtual void Record()
         {
             if (XRXPManager.IsReady && this.TracingEnabled && XRXPManager.Recorder.IsRecording())
             {

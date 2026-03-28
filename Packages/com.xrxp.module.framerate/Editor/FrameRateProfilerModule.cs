@@ -1,5 +1,3 @@
-#if UNITY_EDITOR
-
 using System;
 using Unity.Profiling;
 using Unity.Profiling.Editor;
@@ -28,5 +26,3 @@ namespace XRXP.Modules.FrameRateAnalyser
         public FrameRateProfilerModule() : base(k_Counters, autoEnabledCategoryNames: k_AutoEnabledCategoryNames) { }
     }
 }
-
-#endif
