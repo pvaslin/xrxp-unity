@@ -20,7 +20,7 @@ XR Experiments (XRXP) is a comprehensive framework designed for conducting exper
 
 1. Open Unity Package Manager (Window > Package Manager)
 2. Click the `+` button and select "Add package from git URL"
-3. Enter: `https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.core`
+3. Enter: `https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.core`
 4. Click Add
 
 ### Option 2: Manual Installation
@@ -34,17 +34,17 @@ Extend XRXP with optional modules:
 
 - **Eye Tracking**: Oculus eye tracking integration
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.eyetracking
+  https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking
   ```
 
 - **FrameRate Analyser**: Performance monitoring and peak detection
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.framerate
+  https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.module.framerate
   ```
 
 - **Scene Controller**: WebSocket-based remote scene management
   ```
-  https://github.com/yourorg/xrxp.git?path=/Packages/com.xrxp.module.scenecontroller
+  https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.module.scenecontroller
   ```
 
 ## Quick Start
@@ -71,7 +71,7 @@ XRXPManager.Recorder.StopSession();
 
 ## Documentation
 
-Full documentation is available at: https://espace.science/xrxpdoc/
+Full documentation is available at: https://xrxp.github.io/docs/
 
 ## Dependencies
 

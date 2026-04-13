@@ -117,7 +117,7 @@ namespace XRXP.Editor
         [MenuItem("XRXP/User Guide")]
         static void OpenUserGuide()
         {
-            Application.OpenURL("https://espace.science/xrxpdoc/");
+            Application.OpenURL("https://xrxp.github.io/docs/");
         }
 
         [MenuItem("XRXP/About")]
