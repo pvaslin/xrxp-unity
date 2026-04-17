@@ -20,6 +20,7 @@ namespace XRXP.Editor
         private bool _showAttributeHandlers = true;
         private bool _showStatusValues = true;
         private bool _showEvents = true;
+        private List<(string key, string description)> _cachedEditModeHandlers;
 
         private void OnEnable()
         {
@@ -96,7 +97,7 @@ namespace XRXP.Editor
 
             GUILayout.Space(4);
 
-            // ── Attribute Handlers (runtime, Play mode) ─────────────
+            // ── Attribute Handlers [ExchangeControl] ──────────────────
             _showAttributeHandlers = EditorGUILayout.Foldout(_showAttributeHandlers, "Attribute Handlers [ExchangeControl]", true, EditorStyles.foldoutHeader);
             if (_showAttributeHandlers)
             {
@@ -104,10 +105,15 @@ namespace XRXP.Editor
 
                 if (Application.isPlaying)
                 {
+                    if (GUILayout.Button("Rescan Scene"))
+                    {
+                        manager.DiscoverAttributeHandlers();
+                    }
+
                     var handlers = manager.AttributeHandlers;
                     if (handlers == null || handlers.Count == 0)
                     {
-                        EditorGUILayout.HelpBox("No [ExchangeControl] handlers discovered on sibling/child components.", MessageType.Info);
+                        EditorGUILayout.HelpBox("No [ExchangeControl] handlers discovered. Click 'Rescan Scene' to search all MonoBehaviours.", MessageType.Info);
                     }
                     else
                     {
@@ -116,7 +122,7 @@ namespace XRXP.Editor
                         {
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(handler.Key, GUILayout.Width(140));
-                            EditorGUILayout.LabelField("→", GUILayout.Width(20));
+                            EditorGUILayout.LabelField("\u2192", GUILayout.Width(20));
                             EditorGUILayout.LabelField(handler.TargetDescription);
                             EditorGUILayout.EndHorizontal();
                         }
@@ -125,11 +131,15 @@ namespace XRXP.Editor
                 }
                 else
                 {
-                    // In edit mode, scan for attributes to give a preview
-                    var previewHandlers = ScanAttributeHandlersEditMode(manager);
+                    if (GUILayout.Button("Scan Scene for [ExchangeControl]"))
+                    {
+                        _cachedEditModeHandlers = ScanAttributeHandlersEditMode();
+                    }
+
+                    var previewHandlers = _cachedEditModeHandlers ?? new List<(string, string)>();
                     if (previewHandlers.Count == 0)
                     {
-                        EditorGUILayout.HelpBox("No [ExchangeControl] attributes found on sibling/child components.", MessageType.Info);
+                        EditorGUILayout.HelpBox("Click 'Scan Scene' to find [ExchangeControl] attributes on all MonoBehaviours in the scene.", MessageType.Info);
                     }
                     else
                     {
@@ -138,7 +148,7 @@ namespace XRXP.Editor
                         {
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(key, GUILayout.Width(140));
-                            EditorGUILayout.LabelField("→", GUILayout.Width(20));
+                            EditorGUILayout.LabelField("\u2192", GUILayout.Width(20));
                             EditorGUILayout.LabelField(desc);
                             EditorGUILayout.EndHorizontal();
                         }
@@ -291,16 +301,16 @@ namespace XRXP.Editor
         }
 
         /// <summary>
-        /// Scans for [ExchangeControl] attributes in edit mode (no runtime instance needed).
+        /// Scans for [ExchangeControl] attributes in edit mode across all MonoBehaviours in the scene.
         /// </summary>
-        private List<(string key, string description)> ScanAttributeHandlersEditMode(XRXPExchangeManager manager)
+        private List<(string key, string description)> ScanAttributeHandlersEditMode()
         {
             var results = new List<(string, string)>();
-            var components = manager.GetComponentsInChildren<MonoBehaviour>(true);
+            var components = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
 
             foreach (var component in components)
             {
-                if (component == null || component == manager) continue;
+                if (component == null) continue;
 
                 var type = component.GetType();
                 var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);

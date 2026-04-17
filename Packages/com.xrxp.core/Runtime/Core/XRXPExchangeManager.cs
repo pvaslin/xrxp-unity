@@ -88,15 +88,18 @@ namespace XRXP
 
         private void Awake()
         {
+            _deviceId = SystemInfo.deviceUniqueIdentifier;
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        private async void Start()
+        {
             if (Modality == null)
             {
                 Debug.LogError("XRXP.Exchange: No ExchangeModality assigned. Please assign one in the inspector.");
                 enabled = false;
                 return;
             }
-
-            _deviceId = SystemInfo.deviceUniqueIdentifier;
-            _cancellationTokenSource = new CancellationTokenSource();
 
             // Initialize status values with defaults
             foreach (var field in Modality.StatusFields)
@@ -115,10 +118,7 @@ namespace XRXP
 
             // Discover [ExchangeControl] attribute handlers
             DiscoverAttributeHandlers();
-        }
 
-        private async void Start()
-        {
             await Connect();
         }
 
@@ -169,12 +169,12 @@ namespace XRXP
 
         // ── Attribute Discovery ─────────────────────────────────────────
 
-        private void DiscoverAttributeHandlers()
+        public void DiscoverAttributeHandlers()
         {
             _attributeHandlers.Clear();
 
-            // Scan all MonoBehaviours on this GameObject and children
-            var components = GetComponentsInChildren<MonoBehaviour>(true);
+            // Scan all MonoBehaviours in the scene
+            var components = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             foreach (var component in components)
             {
                 if (component == null || component == this) continue;
@@ -245,11 +245,15 @@ namespace XRXP
             _websocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(5);
 
             int attempts = 3;
-            while (attempts > 0 && _websocket.State != WebSocketState.Open)
+            while (attempts > 0 && _websocket != null && _websocket.State != WebSocketState.Open)
             {
                 try
                 {
                     await _websocket.ConnectAsync(new Uri(connectUrl), _cancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
                 }
                 catch (Exception ex)
                 {
@@ -259,7 +263,7 @@ namespace XRXP
                 }
             }
 
-            if (_websocket.State != WebSocketState.Open)
+            if (_websocket == null || _websocket.State != WebSocketState.Open)
             {
                 Debug.LogError("XRXP.Exchange: Failed to connect to WebSocket server.");
                 return;
