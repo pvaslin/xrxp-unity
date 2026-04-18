@@ -2,13 +2,13 @@
   "name": "com.xrxp.module.eyetracking",
   "version": "0.1.0",
   "displayName": "XR Experiments Eye Tracking",
-  "description": "Eye tracking module for XR Experiments (XRXP) using Oculus integration",
+  "description": "Eye tracking module for XR Experiments (XRXP) using Meta XR integration",
   "unity": "2021.3",
   "unityRelease": "20f1",
   "documentationUrl": "https://xrxp.io/docs/",
   "keywords": [
     "eyetracking",
-    "oculus",
+    "meta",
     "xr",
     "experiment",
     "xrxp"
@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "com.xrxp.core": "0.1.0",
-    "com.unity.xr.oculus": "3.2.3"
+    "com.unity.xr.meta": "3.2.3"
   }
 }

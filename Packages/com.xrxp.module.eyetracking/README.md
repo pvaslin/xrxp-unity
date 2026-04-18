@@ -1,6 +1,6 @@
 # XRXP Eye Tracking
 
-Oculus eye tracking integration module for XRXP Unity framework.
+Eye tracking integration module for XRXP Unity framework.
 
 ## Features
 
@@ -8,15 +8,15 @@ Oculus eye tracking integration module for XRXP Unity framework.
 - **Gaze visualization**: Debug eye direction with LineRenderers
 - **Look area detection**: Track what objects users are looking at
 - **Confidence filtering**: Only record high-quality tracking data
-- **Oculus Integration**: Works with Oculus Quest Pro and compatible headsets
+- **Meta XR Integration**: Works with Meta Quest Pro and compatible headsets
 
 ## Installation
 
 ### Requirements
 - Unity 2021.3 LTS or later
 - XRXP Core package
-- Oculus Integration SDK
-- Eye-tracking capable headset (Quest Pro, etc.)
+- Meta XR SDK
+- Eye-tracking capable headset (Meta Quest Pro, etc.)
 
 ### Package Manager
 
@@ -86,7 +86,7 @@ See the [full documentation](../com.xrxp.core/Documentation~/EyeTracking.md) for
 ## Dependencies
 
 - `com.xrxp.core` (automatically resolved)
-- `Unity.XR.Oculus` (Oculus Integration)
+- `com.unity.xr.meta` (Meta XR Integration)
 
 ## License
 

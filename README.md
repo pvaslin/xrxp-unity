@@ -16,7 +16,7 @@ XRXP (XR Experiments) provides a modular framework for conducting XR research ex
 
 ### Available Modules
 
-- **Eye Tracking** (`com.xrxp.module.eyetracking`): Oculus eye tracking integration for gaze analysis
+- **Eye Tracking** (`com.xrxp.module.eyetracking`): Eye tracking integration for gaze analysis
 - **FrameRate Analyser** (`com.xrxp.module.framerate`): Real-time performance monitoring with Z-score peak detection
 - **Scene Controller** (`com.xrxp.module.scenecontroller`): WebSocket-based remote scene management
 
@@ -24,7 +24,7 @@ XRXP (XR Experiments) provides a modular framework for conducting XR research ex
 
 ### Requirements
 - Unity 2021.3 LTS or later
-- Target platform: PC, Mac, Linux, or VR headsets (Oculus, etc.)
+- Target platform: PC, Mac, Linux, or VR headsets (Meta, Pico, HTC, Valve Index, etc.)
 
 ### Core Package
 

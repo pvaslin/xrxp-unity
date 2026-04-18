@@ -12,7 +12,7 @@ XR Experiments (XRXP) is a comprehensive framework designed for conducting exper
 - **Data Recording**: Multiple storage backends (local, remote, backup)
 - **Event Tracking**: Log events, questions, media, and statistics
 - **Object Tracking**: Track GameObject positions and rotations in world space
-- **XR Ready**: Built for Unity XR Interaction Toolkit and Oculus integration
+- **XR Ready**: Built for Unity XR Interaction Toolkit and Meta XR integration
 
 ## Installation
 
@@ -32,7 +32,7 @@ XR Experiments (XRXP) is a comprehensive framework designed for conducting exper
 
 Extend XRXP with optional modules:
 
-- **Eye Tracking**: Oculus eye tracking integration
+- **Eye Tracking**: Eye tracking integration
   ```
   https://github.com/pvaslin/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking
   ```
@@ -79,11 +79,11 @@ Full documentation is available at: https://xrxp.io/docs/
 - TextMeshPro (com.unity.textmeshpro)
 
 ### Optional
-- Oculus XR Plugin (com.unity.xr.oculus) - for Eye Tracking module
+- Meta XR Plugin (com.unity.xr.meta) - for Eye Tracking module
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MPL-2.0 License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 

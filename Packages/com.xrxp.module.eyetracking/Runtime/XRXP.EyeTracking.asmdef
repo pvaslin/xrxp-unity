@@ -3,7 +3,7 @@
     "rootNamespace": "XRXP.EyeTracking",
     "references": [
         "XRXP.Runtime",
-        "Unity.XR.Oculus"
+        "com.unity.xr.meta"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
