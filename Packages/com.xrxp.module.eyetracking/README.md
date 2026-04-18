@@ -22,14 +22,14 @@ Oculus eye tracking integration module for XRXP Unity framework.
 
 Add via git URL:
 ```
-https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking
+https://github.com/pvaslin/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.module.eyetracking": "https://github.com/xrxp/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking"
+    "com.xrxp.module.eyetracking": "https://github.com/pvaslin/xrxp-unity.git?path=/Packages/com.xrxp.module.eyetracking"
   }
 }
 ```

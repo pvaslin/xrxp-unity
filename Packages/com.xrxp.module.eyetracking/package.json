@@ -5,7 +5,7 @@
   "description": "Eye tracking module for XR Experiments (XRXP) using Oculus integration",
   "unity": "2021.3",
   "unityRelease": "20f1",
-  "documentationUrl": "https://espace.science/xrxpdoc/",
+  "documentationUrl": "https://xrxp.io/docs/",
   "keywords": [
     "eyetracking",
     "oculus",

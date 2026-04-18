@@ -31,14 +31,14 @@ XRXP (XR Experiments) provides a modular framework for conducting XR research ex
 In Unity Package Manager, click `+` > "Add package from git URL" and enter:
 
 ```
-https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core
+https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.core
 ```
 
 Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.core": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core"
+    "com.xrxp.core": "https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.core"
   }
 }
 ```
@@ -48,10 +48,10 @@ Or add to `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.xrxp.core": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core",
-    "com.xrxp.module.eyetracking": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.eyetracking",
-    "com.xrxp.module.framerate": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.framerate",
-    "com.xrxp.module.scenecontroller": "https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.module.scenecontroller"
+    "com.xrxp.core": "https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.core",
+    "com.xrxp.module.eyetracking": "https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.module.eyetracking",
+    "com.xrxp.module.framerate": "https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.module.framerate",
+    "com.xrxp.module.scenecontroller": "https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.module.scenecontroller"
   }
 }
 ```
@@ -60,7 +60,7 @@ Or add to `Packages/manifest.json`:
 
 Append `#v0.1.0` (or a commit hash) to pin a version:
 ```
-https://gitlab.espace.science/pierre/xrxp-unity.git?path=Packages/com.xrxp.core#v0.1.0
+https://github.com/pvaslin/xrxp-unity.git?path=Packages/com.xrxp.core#v0.1.0
 ```
 
 ## Quick Start
@@ -110,7 +110,6 @@ xrxp-unity/
 │   ├── com.xrxp.module.eyetracking/    # Eye tracking module
 │   ├── com.xrxp.module.framerate/      # Performance monitoring
 │   └── com.xrxp.module.scenecontroller/# Remote scene control
-├── AGENTS.md                            # AI agent guidelines
 ├── LICENSE
 └── README.md
 ```
@@ -118,27 +117,13 @@ xrxp-unity/
 ## Documentation
 
 - [Core Package README](Packages/com.xrxp.core/README.md)
-- [Full Documentation](https://espace.science/xrxpdoc/)
-
-## Development
-
-### Coding Standards
-
-See [AGENTS.md](AGENTS.md) for naming conventions, code style, and best practices.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Merge Request
+- [Full Documentation](https://xrxp.io/docs/)
 
 ## License
 
-[MIT License](LICENSE)
+[MPL-2.0 License](LICENSE)
 
 ## Support
 
 - Documentation: See `Documentation~` folders in each package
-- Issues: [GitLab Issues](https://gitlab.espace.science/pierre/xrxp-unity/-/issues)
+- Issues: [GitHub Issues](https://github.com/pvaslin/xrxp-unity/issues)

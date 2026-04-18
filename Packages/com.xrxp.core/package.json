@@ -5,9 +5,9 @@
   "description": "A Unity framework for XR experimentation and data recording",
   "unity": "2021.3",
   "unityRelease": "20f1",
-  "documentationUrl": "https://xrxp.github.io/docs/",
-  "changelogUrl": "https://github.com/xrxp/xrxp-unity/blob/main/Packages/com.xrxp.core/CHANGELOG.md",
-  "licensesUrl": "https://github.com/xrxp/xrxp-unity/blob/main/LICENSE",
+  "documentationUrl": "https://xrxp.io/docs/",
+  "changelogUrl": "https://github.com/pvaslin/xrxp-unity/blob/main/Packages/com.xrxp.core/CHANGELOG.md",
+  "licensesUrl": "https://github.com/pvaslin/xrxp-unity/blob/main/LICENSE",
   "keywords": [
     "xr",
     "experiment",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xrxp/xrxp-unity.git"
+    "url": "https://github.com/pvaslin/xrxp-unity.git"
   },
   "samples": [
     {
