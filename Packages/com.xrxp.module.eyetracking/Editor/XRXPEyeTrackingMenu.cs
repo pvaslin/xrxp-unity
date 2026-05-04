@@ -38,12 +38,14 @@ namespace XRXP.EyeTracking.Editor
 
             tagManager.ApplyModifiedProperties();
             
-            GameObject gm = GameObject.Find("XRXPManager");
-            if (gm == null)
+            XRXPManager manager = Object.FindAnyObjectByType<XRXPManager>();
+            if (manager == null)
             {
                 Debug.LogError("XRXPManager not found in scene. Please run 'XRXP/Setup the scene' first.");
                 return;
             }
+
+            GameObject gm = manager.gameObject;
             
             if (gm.GetComponent<XRXPLookAreaRecorder>() == null)
             {
@@ -57,12 +59,14 @@ namespace XRXP.EyeTracking.Editor
         [MenuItem("XRXP/Modules/Setup Eye Recorder", false, 11)]
         public static void SetupEyeRecorder()
         {
-            GameObject gm = GameObject.Find("XRXPManager");
-            if (gm == null)
+            XRXPManager manager = Object.FindAnyObjectByType<XRXPManager>();
+            if (manager == null)
             {
                 Debug.LogError("XRXPManager not found in scene. Please run 'XRXP/Setup the scene' first.");
                 return;
             }
+
+            GameObject gm = manager.gameObject;
             
             if (gm.GetComponent<XRXPEyeRecorder>() == null)
             {

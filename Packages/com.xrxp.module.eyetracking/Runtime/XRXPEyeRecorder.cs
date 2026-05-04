@@ -83,7 +83,7 @@ namespace XRXP.EyeTracking
         /// <summary>
         /// Call by the LateUpdate method in XRXPObjectTracker
         /// </summary>
-        internal override void Record()
+        protected internal override void Record()
         {
             if (!OVRPlugin.GetEyeGazesState(OVRPlugin.Step.Render, -1, ref _currentEyeGazesState))
                 return;

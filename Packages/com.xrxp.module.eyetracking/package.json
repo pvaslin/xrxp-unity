@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "com.xrxp.core": "0.1.0",
-    "com.unity.xr.meta": "3.2.3"
+    "com.meta.xr.sdk.core": "72.0.0"
   }
 }

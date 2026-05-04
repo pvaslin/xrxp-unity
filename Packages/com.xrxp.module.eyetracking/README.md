@@ -86,7 +86,7 @@ See the [full documentation](../com.xrxp.core/Documentation~/EyeTracking.md) for
 ## Dependencies
 
 - `com.xrxp.core` (automatically resolved)
-- `com.unity.xr.meta` (Meta XR Integration)
+- `com.meta.xr.sdk.core` (Meta XR Integration)
 
 ## License
 
